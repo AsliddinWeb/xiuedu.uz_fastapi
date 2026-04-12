@@ -22,8 +22,6 @@ services:
       retries: 5
     networks:
       - xiuedu_prod_net
-    security_opt:
-      - no-new-privileges:true
 
   backend:
     build:
@@ -43,8 +41,6 @@ services:
       - "8014"
     networks:
       - xiuedu_prod_net
-    security_opt:
-      - no-new-privileges:true
 
   frontend:
     build:
@@ -53,8 +49,6 @@ services:
     container_name: xiuedu_frontend_builder
     volumes:
       - xiuedu_frontend_dist:/app/dist
-    security_opt:
-      - no-new-privileges:true
 
   nginx:
     image: nginx:1.27-alpine
@@ -70,8 +64,6 @@ services:
       - "8100:80"
     networks:
       - xiuedu_prod_net
-    security_opt:
-      - no-new-privileges:true
 
 volumes:
   xiuedu_redisdata:
