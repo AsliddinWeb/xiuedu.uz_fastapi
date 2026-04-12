@@ -1,0 +1,16 @@
+{
+  "name": "Xalqaro Innovatsion Universiteti",
+  "short_name": "XIU Edu",
+  "description": "O'zbekistondagi yetakchi xususiy universitet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1F4B",
+  "theme_color": "#0B1F4B",
+  "lang": "uz",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

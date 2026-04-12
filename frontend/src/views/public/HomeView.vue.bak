@@ -1,0 +1,1485 @@
+<script setup>
+/**
+ * HomeView v3 — content-rich, professional homepage.
+ *
+ * Sections:
+ *   1.  Hero (dark, photo + particles)
+ *   2.  Quick actions ribbon (overlap)
+ *   3.  University intro strip (about-mini)
+ *   4.  Why XIU — 4 pillars
+ *   5.  Programs showcase (tabs)
+ *   6.  Faculties grid (NEW)
+ *   7.  Admission journey 4-step (NEW)
+ *   8.  Numbers in context
+ *   9.  Campus editorial
+ *   10. Upcoming events (NEW — live API)
+ *   11. Latest news
+ *   12. Testimonials
+ *   13. International partners (NEW)
+ *   14. Recognition / accreditation
+ *   15. FAQ
+ *   16. Final CTA (dark)
+ */
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import {
+  ArrowRightIcon, ChevronRightIcon, ArrowUpRightIcon,
+  AcademicCapIcon, BookOpenIcon, CalendarDaysIcon, UserCircleIcon,
+  GlobeAltIcon, UserGroupIcon, BriefcaseIcon, BuildingOffice2Icon,
+  PhoneIcon, ClockIcon, MapPinIcon, ChevronDownIcon,
+  StarIcon, ShieldCheckIcon, BeakerIcon, ScaleIcon,
+  LanguageIcon, ChartBarIcon, ComputerDesktopIcon, PaintBrushIcon,
+  DocumentTextIcon, ClipboardDocumentCheckIcon, IdentificationIcon, SparklesIcon,
+  PlayIcon, MegaphoneIcon, BanknotesIcon, ChatBubbleLeftRightIcon,
+  PencilSquareIcon, CodeBracketIcon, CpuChipIcon, ServerStackIcon,
+  LockClosedIcon, CameraIcon, BuildingLibraryIcon, LightBulbIcon,
+  XMarkIcon, ChevronLeftIcon, ArrowsPointingOutIcon
+} from '@heroicons/vue/24/outline'
+
+import { NewsAPI, EventsAPI } from '@/api/endpoints'
+import { useScrollAnimation } from '@/composables/useScrollAnimation'
+import { useSeo } from '@/composables/useSeo'
+import { organizationSchema, breadcrumbSchema, graph } from '@/utils/schema'
+
+const { t } = useI18n()
+useScrollAnimation()
+useSeo(() => ({
+  title: t('site.name'),
+  description: t('home.hero_subtitle'),
+  type: 'website',
+  schema: graph(organizationSchema(), breadcrumbSchema([{ name: t('nav.home'), url: '/' }]))
+}))
+
+// ════════════════════════════════════════════════════════════
+//  Hero — minimal particle field
+// ════════════════════════════════════════════════════════════
+const particleCanvas = ref(null)
+let rafId = null
+let resizeHandler = null
+
+onMounted(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const canvas = particleCanvas.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  let W, H, particles
+  const resize = () => { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight }
+  const init = () => {
+    particles = Array.from({ length: 44 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.4 + 0.4,
+      vx: (Math.random() - 0.5) * 0.16,
+      vy: (Math.random() - 0.5) * 0.16,
+      a: Math.random() * 0.35 + 0.1
+    }))
+  }
+  const draw = () => {
+    ctx.clearRect(0, 0, W, H)
+    for (const p of particles) {
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(255,255,255,${p.a})`; ctx.fill()
+      p.x += p.vx; p.y += p.vy
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0
+    }
+    rafId = requestAnimationFrame(draw)
+  }
+  resize(); init(); draw()
+  resizeHandler = () => { resize(); init() }
+  window.addEventListener('resize', resizeHandler, { passive: true })
+})
+onBeforeUnmount(() => {
+  if (rafId) cancelAnimationFrame(rafId)
+  if (resizeHandler) window.removeEventListener('resize', resizeHandler)
+})
+
+// ════════════════════════════════════════════════════════════
+//  Static data
+// ════════════════════════════════════════════════════════════
+const heroStats = [
+  { value: '5000+', labelKey: 'home.stat_students_long' },
+  { value: '150+',  labelKey: 'home.stat_faculty_long' },
+  { value: '50+',   labelKey: 'home.stat_partners' }
+]
+
+const quickActions = [
+  { key: 'apply',    icon: ArrowUpRightIcon, href: 'https://admission.xiuedu.uz', external: true, titleKey: 'home.qa_apply_title',    descKey: 'home.qa_apply_desc',    accent: true },
+  { key: 'programs', icon: BookOpenIcon,     to: '/faculties',                                    titleKey: 'home.qa_programs_title', descKey: 'home.qa_programs_desc' },
+  { key: 'hemis',    icon: UserCircleIcon,   href: 'https://student.xiuedu.uz', external: true,   titleKey: 'home.qa_hemis_title',    descKey: 'home.qa_hemis_desc' },
+  { key: 'calendar', icon: CalendarDaysIcon, to: '/events',                                       titleKey: 'home.qa_calendar_title', descKey: 'home.qa_calendar_desc' }
+]
+
+// Intro pillars
+const introPillars = [
+  { icon: ShieldCheckIcon, titleKey: 'home.intro_p1_title', descKey: 'home.intro_p1_desc' },
+  { icon: GlobeAltIcon,    titleKey: 'home.intro_p2_title', descKey: 'home.intro_p2_desc' },
+  { icon: SparklesIcon,    titleKey: 'home.intro_p3_title', descKey: 'home.intro_p3_desc' }
+]
+
+const whyCards = [
+  { key: 'intl',    icon: GlobeAltIcon,        iconBg: 'bg-primary-50',  iconClr: 'text-primary-700',  number: '50+',  numberLabel: 'partner',    titleKey: 'home.why1_title', descKey: 'home.why1_desc' },
+  { key: 'faculty', icon: UserGroupIcon,       iconBg: 'bg-accent-50',   iconClr: 'text-accent-600',   number: '150+', numberLabel: 'professor',  titleKey: 'home.why2_title', descKey: 'home.why2_desc' },
+  { key: 'career',  icon: BriefcaseIcon,       iconBg: 'bg-emerald-50',  iconClr: 'text-emerald-700',  number: '95%',  numberLabel: 'ish bilan',  titleKey: 'home.why3_title', descKey: 'home.why3_desc' },
+  { key: 'campus',  icon: BuildingOffice2Icon, iconBg: 'bg-purple-50',   iconClr: 'text-purple-700',   number: '12',   numberLabel: "yo'nalish",  titleKey: 'home.why4_title', descKey: 'home.why4_desc' }
+]
+
+// Faculties + their programs.
+// Each program has its own icon, bg colour and meta info so cards
+// in the Academic section can be visually distinct.
+const faculties = [
+  {
+    slug: 'pedagogika',
+    name: 'Pedagogika',
+    icon: AcademicCapIcon,
+    programs: [
+      { name: "Boshlang'ich ta'lim",      icon: BookOpenIcon,             duration: '4 yil', tuition: '16 mln', lang: "O'zbek",  bg: 'bg-indigo-50  dark:bg-indigo-900/15',  iconBg: 'bg-indigo-500',  ring: 'ring-indigo-200/60' },
+      { name: "Maktabgacha ta'lim",       icon: UserGroupIcon,            duration: '4 yil', tuition: '14 mln', lang: "O'zbek",  bg: 'bg-blue-50    dark:bg-blue-900/15',    iconBg: 'bg-blue-500',    ring: 'ring-blue-200/60' },
+      { name: "Pedagogika va psixologiya", icon: ChatBubbleLeftRightIcon, duration: '2 yil (M)', tuition: '22 mln', lang: "O'zbek",  bg: 'bg-violet-50  dark:bg-violet-900/15',  iconBg: 'bg-violet-500',  ring: 'ring-violet-200/60' },
+      { name: "Maxsus pedagogika",        icon: LightBulbIcon,            duration: '4 yil', tuition: '15 mln', lang: "O'zbek",  bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/15', iconBg: 'bg-fuchsia-500', ring: 'ring-fuchsia-200/60' }
+    ]
+  },
+  {
+    slug: 'iqtisodiyot',
+    name: 'Iqtisodiyot',
+    icon: ChartBarIcon,
+    programs: [
+      { name: "Iqtisodiyot va menejment", icon: ChartBarIcon,    duration: '4 yil',  tuition: '18 mln', lang: "O'zbek",        bg: 'bg-emerald-50 dark:bg-emerald-900/15', iconBg: 'bg-emerald-500', ring: 'ring-emerald-200/60' },
+      { name: "Marketing",                icon: MegaphoneIcon,   duration: '4 yil',  tuition: '18 mln', lang: 'Ingliz',        bg: 'bg-rose-50    dark:bg-rose-900/15',    iconBg: 'bg-rose-500',    ring: 'ring-rose-200/60' },
+      { name: "Moliya va bank ishi",      icon: BanknotesIcon,   duration: '4 yil',  tuition: '19 mln', lang: "O'zbek",        bg: 'bg-teal-50    dark:bg-teal-900/15',    iconBg: 'bg-teal-500',    ring: 'ring-teal-200/60' },
+      { name: "MBA",                      icon: BriefcaseIcon,   duration: '1.5 yil', tuition: '32 mln', lang: 'Ingliz',       bg: 'bg-amber-50   dark:bg-amber-900/15',   iconBg: 'bg-amber-500',   ring: 'ring-amber-200/60' }
+    ]
+  },
+  {
+    slug: 'filologiya',
+    name: 'Filologiya',
+    icon: LanguageIcon,
+    programs: [
+      { name: "Ingliz tili va adabiyoti", icon: LanguageIcon,    duration: '4 yil', tuition: '17 mln', lang: 'Ingliz',  bg: 'bg-amber-50  dark:bg-amber-900/15',  iconBg: 'bg-amber-500',   ring: 'ring-amber-200/60' },
+      { name: "Tarjimashunoslik",         icon: GlobeAltIcon,    duration: '4 yil', tuition: '17 mln', lang: 'Ingliz',  bg: 'bg-orange-50 dark:bg-orange-900/15', iconBg: 'bg-orange-500',  ring: 'ring-orange-200/60' },
+      { name: "Lingvistika",              icon: BookOpenIcon,    duration: '2 yil (M)', tuition: '21 mln', lang: 'Ingliz',  bg: 'bg-yellow-50 dark:bg-yellow-900/15', iconBg: 'bg-yellow-500',  ring: 'ring-yellow-200/60' },
+      { name: "Akademik yozish",          icon: PencilSquareIcon, duration: '3 oy',  tuition: '2.5 mln', lang: 'Ingliz', bg: 'bg-red-50    dark:bg-red-900/15',    iconBg: 'bg-red-500',     ring: 'ring-red-200/60' }
+    ]
+  },
+  {
+    slug: 'huquq',
+    name: 'Huquqshunoslik',
+    icon: ScaleIcon,
+    programs: [
+      { name: "Xalqaro huquq",     icon: GlobeAltIcon,        duration: '4 yil', tuition: '18 mln', lang: "O'zbek/Ingliz", bg: 'bg-slate-50  dark:bg-slate-800/40',  iconBg: 'bg-slate-700',  ring: 'ring-slate-200/60' },
+      { name: "Fuqarolik huquqi",  icon: ScaleIcon,           duration: '4 yil', tuition: '17 mln', lang: "O'zbek",        bg: 'bg-stone-50  dark:bg-stone-800/40',  iconBg: 'bg-stone-700',  ring: 'ring-stone-200/60' },
+      { name: "Jinoyat huquqi",    icon: ShieldCheckIcon,     duration: '4 yil', tuition: '17 mln', lang: "O'zbek",        bg: 'bg-zinc-50   dark:bg-zinc-800/40',   iconBg: 'bg-zinc-700',   ring: 'ring-zinc-200/60' },
+      { name: "Korporativ huquq",  icon: BuildingOffice2Icon, duration: '2 yil (M)', tuition: '24 mln', lang: 'Ingliz',    bg: 'bg-neutral-50 dark:bg-neutral-800/40', iconBg: 'bg-neutral-700', ring: 'ring-neutral-200/60' }
+    ]
+  },
+  {
+    slug: 'it',
+    name: 'IT va Muhandislik',
+    icon: ComputerDesktopIcon,
+    programs: [
+      { name: "Dasturiy injiniring",  icon: CodeBracketIcon,    duration: '4 yil', tuition: '22 mln', lang: 'Ingliz',  bg: 'bg-sky-50    dark:bg-sky-900/15',    iconBg: 'bg-sky-500',    ring: 'ring-sky-200/60' },
+      { name: "Ma'lumotlar fani",     icon: ServerStackIcon,    duration: '4 yil', tuition: '22 mln', lang: 'Ingliz',  bg: 'bg-cyan-50   dark:bg-cyan-900/15',   iconBg: 'bg-cyan-500',   ring: 'ring-cyan-200/60' },
+      { name: "Cyber xavfsizlik",     icon: LockClosedIcon,     duration: '4 yil', tuition: '24 mln', lang: 'Ingliz',  bg: 'bg-blue-50   dark:bg-blue-900/15',   iconBg: 'bg-blue-600',   ring: 'ring-blue-200/60' },
+      { name: "AI va Machine Learning", icon: CpuChipIcon,      duration: '2 yil (M)', tuition: '28 mln', lang: 'Ingliz', bg: 'bg-indigo-50 dark:bg-indigo-900/15', iconBg: 'bg-indigo-600', ring: 'ring-indigo-200/60' }
+    ]
+  },
+  {
+    slug: 'sanat',
+    name: "Dizayn va san'at",
+    icon: PaintBrushIcon,
+    programs: [
+      { name: "Grafik dizayn",     icon: PaintBrushIcon,      duration: '4 yil', tuition: '16 mln', lang: "O'zbek",  bg: 'bg-pink-50    dark:bg-pink-900/15',    iconBg: 'bg-pink-500',    ring: 'ring-pink-200/60' },
+      { name: "UX/UI dizayn",      icon: ComputerDesktopIcon, duration: '3 oy',  tuition: '3 mln',  lang: 'Ingliz',  bg: 'bg-rose-50    dark:bg-rose-900/15',    iconBg: 'bg-rose-500',    ring: 'ring-rose-200/60' },
+      { name: "Fotografiya",       icon: CameraIcon,          duration: '4 oy',  tuition: '3 mln',  lang: "O'zbek",  bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/15', iconBg: 'bg-fuchsia-500', ring: 'ring-fuchsia-200/60' },
+      { name: "San'atshunoslik",   icon: SparklesIcon,        duration: '4 yil', tuition: '15 mln', lang: "O'zbek",  bg: 'bg-purple-50  dark:bg-purple-900/15',  iconBg: 'bg-purple-500',  ring: 'ring-purple-200/60' }
+    ]
+  }
+]
+
+const activeFaculty = ref('pedagogika')
+const visibleFaculty = computed(() => faculties.find(f => f.slug === activeFaculty.value) || faculties[0])
+
+// Hero trust badges
+const heroTrust = [
+  { label: 'Cambridge', sub: 'English Partner' },
+  { label: 'ISO 9001',  sub: 'Quality Cert' },
+  { label: 'OTV',       sub: 'Litsenziya' }
+]
+
+// Admission journey steps
+const admissionSteps = [
+  { num: '01', icon: DocumentTextIcon,             titleKey: 'home.adm_step1_title', descKey: 'home.adm_step1_desc' },
+  { num: '02', icon: ClipboardDocumentCheckIcon,   titleKey: 'home.adm_step2_title', descKey: 'home.adm_step2_desc' },
+  { num: '03', icon: IdentificationIcon,           titleKey: 'home.adm_step3_title', descKey: 'home.adm_step3_desc' },
+  { num: '04', icon: SparklesIcon,                 titleKey: 'home.adm_step4_title', descKey: 'home.adm_step4_desc' }
+]
+
+const numbersInContext = [
+  { value: '5,000+',  label: 'Hozirgi talabalar',          sub: "Barcha yo'nalishlar" },
+  { value: '12,000+', label: 'Bitiruvchilarimiz',          sub: '2009 yildan beri' },
+  { value: '95%',     label: "Ish bilan ta'minlanganlik",  sub: '6 oy ichida' },
+  { value: '50+',     label: 'Xalqaro hamkor',             sub: '15 mamlakatda' }
+]
+
+// News
+const newsItems = ref([])
+// Events
+const eventItems = ref([])
+
+onMounted(async () => {
+  try {
+    const [news, events] = await Promise.all([
+      NewsAPI.list({ limit: 5 }).catch(() => ({ items: [] })),
+      EventsAPI.list({ when: 'upcoming', limit: 3 }).catch(() => ({ items: [] }))
+    ])
+    newsItems.value = news.items || []
+    eventItems.value = events.items || []
+  } catch (_) {}
+})
+
+function fmtDate(d) {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+function dayPart(d) {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('uz-UZ', { day: '2-digit' })
+}
+function monthPart(d) {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('uz-UZ', { month: 'short' }).toUpperCase()
+}
+
+// Testimonials
+const testimonials = [
+  { id: 1, textKey: 'home.test_1_text', nameKey: 'home.test_1_name', roleKey: 'home.test_1_role', avatar: 'https://i.pravatar.cc/120?img=44' },
+  { id: 2, textKey: 'home.test_2_text', nameKey: 'home.test_2_name', roleKey: 'home.test_2_role', avatar: 'https://i.pravatar.cc/120?img=33' },
+  { id: 3, textKey: 'home.test_3_text', nameKey: 'home.test_3_name', roleKey: 'home.test_3_role', avatar: 'https://i.pravatar.cc/120?img=49' }
+]
+
+// International partners (country chips)
+const partners = [
+  { flag: '🇬🇧', country: 'Buyuk Britaniya', count: 8 },
+  { flag: '🇺🇸', country: 'AQSH',            count: 6 },
+  { flag: '🇩🇪', country: 'Germaniya',       count: 5 },
+  { flag: '🇰🇷', country: 'Janubiy Koreya',  count: 4 },
+  { flag: '🇯🇵', country: 'Yaponiya',        count: 3 },
+  { flag: '🇹🇷', country: 'Turkiya',         count: 7 },
+  { flag: '🇨🇿', country: 'Chexiya',         count: 3 },
+  { flag: '🇲🇾', country: 'Malayziya',       count: 4 },
+  { flag: '🇮🇳', country: 'Hindiston',       count: 5 },
+  { flag: '🇨🇳', country: 'Xitoy',           count: 5 }
+]
+
+// Licenses & accreditation certificates (A4 documents).
+// Replace `image` URLs with real scans uploaded via admin/media.
+const licenses = [
+  {
+    title: "Oliy ta'lim vazirligi litsenziyasi",
+    issuer: "O'zbekiston Respublikasi OTV",
+    year:   '2024',
+    image:  'https://picsum.photos/seed/xiu-license-1/600/848'
+  },
+  {
+    title: 'ISO 9001:2015 sertifikati',
+    issuer: 'TÜV International',
+    year:   '2024',
+    image:  'https://picsum.photos/seed/xiu-license-2/600/848'
+  },
+  {
+    title: 'Cambridge English Partner',
+    issuer: 'Cambridge Assessment',
+    year:   '2023',
+    image:  'https://picsum.photos/seed/xiu-license-3/600/848'
+  },
+  {
+    title: 'Davlat akkreditatsiyasi',
+    issuer: "Ta'lim sifatini nazorat qilish davlat inspektsiyasi",
+    year:   '2023',
+    image:  'https://picsum.photos/seed/xiu-license-4/600/848'
+  }
+]
+
+// License lightbox state
+const licenseOpen = ref(false)
+const licenseIdx = ref(0)
+function openLicense(i) { licenseIdx.value = i; licenseOpen.value = true }
+function closeLicense() { licenseOpen.value = false }
+function prevLicense() { licenseIdx.value = (licenseIdx.value - 1 + licenses.length) % licenses.length }
+function nextLicense() { licenseIdx.value = (licenseIdx.value + 1) % licenses.length }
+function onLicenseKey(e) {
+  if (!licenseOpen.value) return
+  if (e.key === 'Escape') closeLicense()
+  if (e.key === 'ArrowLeft') prevLicense()
+  if (e.key === 'ArrowRight') nextLicense()
+}
+onMounted(() => window.addEventListener('keydown', onLicenseKey))
+onBeforeUnmount(() => window.removeEventListener('keydown', onLicenseKey))
+
+// FAQ
+const faqs = [
+  { q: 'home.faq_q1', a: 'home.faq_a1' },
+  { q: 'home.faq_q2', a: 'home.faq_a2' },
+  { q: 'home.faq_q3', a: 'home.faq_a3' },
+  { q: 'home.faq_q4', a: 'home.faq_a4' },
+  { q: 'home.faq_q5', a: 'home.faq_a5' }
+]
+const openFaq = ref(0)
+function toggleFaq(i) { openFaq.value = openFaq.value === i ? -1 : i }
+</script>
+
+<template>
+  <div class="bg-white dark:bg-slate-900">
+    <!-- ═══════════════════════════════════════════════════════
+         1. HERO — dark, photo-driven
+    ════════════════════════════════════════════════════════════ -->
+    <section
+      class="relative overflow-hidden"
+      style="background: linear-gradient(135deg, #0A0D3D 0%, #1A1F6E 55%, #2D3A8C 100%);"
+    >
+      <div
+        class="absolute pointer-events-none"
+        style="right: -15%; top: 50%; transform: translateY(-50%); width: 800px; height: 800px;
+               background: radial-gradient(circle, rgba(80,100,210,0.32) 0%, rgba(80,100,210,0.10) 35%, transparent 65%);"
+      />
+      <div
+        class="absolute pointer-events-none"
+        style="top: -10%; left: -8%; width: 500px; height: 500px;
+               background: radial-gradient(circle, rgba(30,40,120,0.45) 0%, transparent 65%);"
+      />
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 38px 38px;"
+      />
+      <canvas ref="particleCanvas" class="absolute inset-0 pointer-events-none opacity-30" />
+
+      <div class="relative z-10 container-narrow pt-16 pb-32 lg:pt-20 lg:pb-40">
+        <div class="grid lg:grid-cols-[1.05fr_1fr] gap-12 xl:gap-16 items-center">
+          <!-- LEFT -->
+          <div>
+            <div class="hero-enter inline-flex items-center gap-2 px-3.5 py-1.5 mb-7 rounded-full"
+                 style="animation-delay: 0.05s; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75" />
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-500" />
+              </span>
+              <span class="text-[12px] text-white/80 font-medium tracking-tight">{{ t('home.eyebrow') }}</span>
+            </div>
+
+            <h1 class="font-display font-bold text-white leading-[1.05] tracking-tight">
+              <span class="hero-enter block text-[40px] md:text-[52px] xl:text-[64px]" style="animation-delay: 0.15s;">
+                {{ t('home.hero_line1') }}
+              </span>
+              <span class="hero-enter block text-[40px] md:text-[52px] xl:text-[64px]" style="animation-delay: 0.28s;">
+                <span
+                  class="text-transparent bg-clip-text"
+                  style="background-image: linear-gradient(135deg, #FFD74D 0%, #FFB300 50%, #FF8C00 100%); -webkit-background-clip: text;"
+                >{{ t('home.hero_line2') }}</span>
+              </span>
+              <span class="hero-enter block text-[34px] md:text-[44px] xl:text-[52px] text-white/70 font-semibold mt-1"
+                    style="animation-delay: 0.42s;">
+                {{ t('home.hero_line3') }}
+              </span>
+            </h1>
+
+            <p class="hero-enter mt-7 text-[17px] md:text-lg text-white/60 leading-relaxed max-w-[520px]"
+               style="animation-delay: 0.55s;">
+              {{ t('home.hero_subtitle') }}
+            </p>
+
+            <div class="hero-enter mt-8 flex items-center gap-8" style="animation-delay: 0.65s;">
+              <div v-for="s in heroStats" :key="s.value">
+                <div class="text-3xl md:text-[32px] font-display font-extrabold text-white tracking-tight">{{ s.value }}</div>
+                <div class="text-[11px] text-white/45 mt-0.5 uppercase tracking-wider">{{ t(s.labelKey) }}</div>
+              </div>
+            </div>
+
+            <div class="hero-enter mt-9 flex flex-wrap items-center gap-4" style="animation-delay: 0.78s;">
+              <a
+                href="https://admission.xiuedu.uz"
+                target="_blank"
+                rel="noopener"
+                class="group relative inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-[15px] overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                style="background: linear-gradient(135deg, #FFB300 0%, #FF8C00 100%); color: #0A0D3D; box-shadow: 0 8px 32px rgba(255,179,0,0.35);"
+              >
+                <span class="relative z-10">{{ t('home.cta_apply') }}</span>
+                <ArrowRightIcon class="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+              <RouterLink
+                to="/about"
+                class="group inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-[15px] text-white border border-white/20 hover:bg-white/[0.06] hover:border-white/30 transition-all"
+              >
+                <PlayIcon class="w-4 h-4" />
+                {{ t('home.hero_video_btn') }}
+              </RouterLink>
+            </div>
+
+            <!-- Trust badges row -->
+            <div class="hero-enter mt-10 pt-8 border-t border-white/10" style="animation-delay: 0.92s;">
+              <p class="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4 font-semibold">{{ t('home.hero_trust_label') }}</p>
+              <div class="flex flex-wrap items-center gap-x-7 gap-y-3">
+                <div
+                  v-for="b in heroTrust"
+                  :key="b.label"
+                  class="flex items-center gap-2"
+                >
+                  <div
+                    class="w-9 h-9 rounded-lg grid place-items-center"
+                    style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);"
+                  >
+                    <ShieldCheckIcon class="w-4 h-4 text-accent-400" />
+                  </div>
+                  <div class="leading-tight">
+                    <p class="text-[12px] font-bold text-white/85">{{ b.label }}</p>
+                    <p class="text-[10px] text-white/40">{{ b.sub }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT — Hero photo with quote overlay -->
+          <div class="hero-enter relative hidden lg:block" style="animation-delay: 0.4s;">
+            <!-- decorative back layer -->
+            <div
+              class="absolute inset-0 rounded-3xl translate-x-5 translate-y-5"
+              style="border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03);"
+            />
+            <!-- floating rating card (top-right, outside photo) -->
+            <div
+              class="absolute -top-4 -right-4 z-20 px-4 py-3 rounded-2xl flex items-center gap-3"
+              style="background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2);"
+            >
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 grid place-items-center text-white">
+                <StarIcon class="w-5 h-5" />
+              </div>
+              <div class="leading-tight">
+                <p class="text-[15px] font-display font-extrabold text-primary-900">TOP-3</p>
+                <p class="text-[10px] font-semibold text-ink-faint">{{ t('home.hero_badge_rating') }}</p>
+              </div>
+            </div>
+
+            <!-- main photo -->
+            <div
+              class="relative aspect-[4/5] rounded-3xl overflow-hidden"
+              style="box-shadow: 0 30px 80px rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.1);"
+            >
+              <img
+                src="https://picsum.photos/seed/xiu-hero-photo/720/900"
+                alt="XIU student"
+                width="720" height="900"
+                loading="eager"
+                fetchpriority="high"
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-tr from-[#0A0D3D]/55 via-transparent to-transparent" />
+
+              <!-- centered video play button -->
+              <button
+                type="button"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group/play"
+                aria-label="Video tur"
+              >
+                <span class="absolute inset-0 rounded-full bg-white/25 animate-ping" />
+                <span class="relative w-16 h-16 rounded-full bg-white/95 grid place-items-center shadow-2xl group-hover/play:scale-110 transition-transform">
+                  <PlayIcon class="w-7 h-7 text-primary-900 ml-1" />
+                </span>
+              </button>
+
+              <!-- bottom quote card -->
+              <div
+                class="absolute bottom-6 left-6 right-6 p-5 rounded-2xl"
+                style="background: rgba(10,13,61,0.78); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12);"
+              >
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-10 h-10 rounded-xl grid place-items-center flex-shrink-0"
+                    style="background: rgba(255,179,0,0.15); border: 1px solid rgba(255,179,0,0.3);"
+                  >
+                    <StarIcon class="w-5 h-5 text-accent-400" />
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-[13px] text-white/85 leading-snug">
+                      "Bu yerda men nafaqat bilim, balki kelajakka aniq qadam tashlash imkoniyatini topdim."
+                    </p>
+                    <p class="text-[11px] text-white/50 mt-1.5">Madina K. — Bitiruvchi 2024</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- floating bottom-left stat card -->
+            <div
+              class="absolute -bottom-5 -left-5 z-20 px-4 py-3 rounded-2xl"
+              style="background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2);"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 grid place-items-center text-white">
+                  <BriefcaseIcon class="w-5 h-5" />
+                </div>
+                <div class="leading-tight">
+                  <p class="text-[15px] font-display font-extrabold text-primary-900">95%</p>
+                  <p class="text-[10px] font-semibold text-ink-faint">{{ t('home.hero_badge_employed') }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scroll down indicator -->
+        <div class="hero-enter mt-16 hidden lg:flex justify-center" style="animation-delay: 1.1s;">
+          <div class="flex flex-col items-center gap-2 text-white/40">
+            <span class="text-[10px] uppercase tracking-[0.25em] font-semibold">{{ t('home.hero_scroll') }}</span>
+            <span class="w-px h-10 bg-gradient-to-b from-white/40 to-transparent animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+        style="background: linear-gradient(to bottom, transparent 0%, #F5F7FF 100%);"
+      />
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         2. QUICK ACTIONS RIBBON
+    ════════════════════════════════════════════════════════════ -->
+    <section class="relative -mt-16 z-10">
+      <div class="container-narrow">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" data-animate>
+          <component
+            v-for="qa in quickActions"
+            :key="qa.key"
+            :is="qa.external ? 'a' : 'router-link'"
+            :href="qa.external ? qa.href : undefined"
+            :to="!qa.external ? qa.to : undefined"
+            :target="qa.external ? '_blank' : undefined"
+            :rel="qa.external ? 'noopener' : undefined"
+            :class="[
+              'group flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-slate-800 transition-all duration-200 hover:-translate-y-0.5',
+              qa.accent
+                ? 'shadow-[0_12px_40px_rgba(255,179,0,0.25)] ring-1 ring-accent-200/60'
+                : 'shadow-[0_12px_40px_rgba(10,13,61,0.10)] ring-1 ring-surface-muted/60'
+            ]"
+          >
+            <div
+              :class="[
+                'w-11 h-11 rounded-xl grid place-items-center flex-shrink-0 transition-colors',
+                qa.accent
+                  ? 'bg-accent-500 text-white group-hover:bg-accent-600'
+                  : 'bg-primary-50 text-primary-700 group-hover:bg-primary-100 dark:bg-slate-700 dark:text-primary-300'
+              ]"
+            >
+              <component :is="qa.icon" class="w-5 h-5" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-ink-dark dark:text-white">{{ t(qa.titleKey) }}</p>
+              <p class="text-xs text-ink-light dark:text-slate-400 mt-0.5 truncate">{{ t(qa.descKey) }}</p>
+            </div>
+            <ArrowRightIcon class="w-4 h-4 text-ink-faint group-hover:text-accent-500 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+          </component>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         3. UNIVERSITY INTRO STRIP
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24 lg:py-28">
+      <div class="container-narrow">
+        <div class="grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-20 items-center">
+          <!-- Left: text -->
+          <div data-animate>
+            <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+              {{ t('home.intro_eyebrow') }}
+            </p>
+            <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight mb-6">
+              {{ t('home.intro_title') }}
+            </h2>
+            <p class="text-[16px] text-ink-light dark:text-slate-400 leading-relaxed mb-4">
+              {{ t('home.intro_p1') }}
+            </p>
+            <p class="text-[16px] text-ink-light dark:text-slate-400 leading-relaxed mb-8">
+              {{ t('home.intro_p2') }}
+            </p>
+            <RouterLink
+              to="/about"
+              class="group inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-50 hover:bg-primary-100 text-primary-800 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 font-semibold text-[14px] transition-colors"
+            >
+              {{ t('home.intro_link') }}
+              <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </RouterLink>
+          </div>
+
+          <!-- Right: 3 pillar cards stacked -->
+          <div class="space-y-4" data-animate data-delay="100">
+            <div
+              v-for="(p, i) in introPillars"
+              :key="i"
+              class="group relative p-6 rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 hover:border-accent-300 dark:hover:border-accent-600 hover:shadow-[0_10px_40px_rgba(10,13,61,0.08)] transition-all duration-300"
+            >
+              <div class="flex items-start gap-5">
+                <div class="w-12 h-12 rounded-xl grid place-items-center flex-shrink-0 bg-gradient-to-br from-primary-700 to-primary-900 text-white shadow-md">
+                  <component :is="p.icon" class="w-6 h-6" stroke-width="1.8" />
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-base font-display font-bold text-ink-dark dark:text-white mb-1.5">{{ t(p.titleKey) }}</h3>
+                  <p class="text-[13.5px] text-ink-light dark:text-slate-400 leading-relaxed">{{ t(p.descKey) }}</p>
+                </div>
+              </div>
+              <div class="absolute right-5 top-5 w-7 h-7 rounded-full grid place-items-center text-[11px] font-bold text-accent-600 bg-accent-50 dark:bg-accent-900/30">
+                0{{ i + 1 }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         4. NEWS — featured + side list (editorial layout)
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24 lg:py-28 bg-surface-light dark:bg-slate-800/40 border-y border-surface-muted/60 dark:border-slate-800">
+      <div class="container-narrow">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
+          <div data-animate>
+            <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+              {{ t('home.news_compact_eyebrow') }}
+            </p>
+            <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">
+              {{ t('home.news_compact_title') }}
+            </h2>
+            <p class="mt-3 text-[15px] text-ink-light dark:text-slate-400 max-w-xl">
+              {{ t('home.news_lead') }}
+            </p>
+          </div>
+          <RouterLink
+            to="/news"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-50 hover:bg-primary-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-primary-800 dark:text-white text-[13px] font-bold transition-colors group whitespace-nowrap self-start sm:self-auto"
+          >
+            {{ t('home.news_all') }}
+            <ArrowRightIcon class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+          </RouterLink>
+        </div>
+
+        <!-- Skeleton state -->
+        <div v-if="!newsItems.length" class="grid lg:grid-cols-[1.55fr_1fr] gap-6">
+          <div class="aspect-[16/10] rounded-3xl bg-surface-soft dark:bg-slate-800 animate-pulse" />
+          <div class="space-y-4">
+            <div v-for="n in 4" :key="`s${n}`" class="flex gap-4 p-3 rounded-2xl bg-surface-soft dark:bg-slate-800 animate-pulse">
+              <div class="w-24 h-20 rounded-xl bg-surface-muted dark:bg-slate-700 flex-shrink-0" />
+              <div class="flex-1 space-y-2 py-1">
+                <div class="h-3 w-1/3 rounded bg-surface-muted dark:bg-slate-700" />
+                <div class="h-4 w-3/4 rounded bg-surface-muted dark:bg-slate-700" />
+                <div class="h-3 w-1/4 rounded bg-surface-muted dark:bg-slate-700" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Editorial layout: featured + side list -->
+        <div v-else class="grid lg:grid-cols-[1.55fr_1fr] gap-6">
+          <!-- Featured (latest) news -->
+          <RouterLink
+            v-if="newsItems[0]"
+            :to="`/news/${newsItems[0].slug}`"
+            data-animate
+            class="group relative overflow-hidden rounded-3xl bg-surface-soft dark:bg-slate-800 lg:row-span-1 min-h-[460px] lg:min-h-[560px]"
+          >
+            <img
+              :src="newsItems[0].cover_image || `https://picsum.photos/seed/xiu-news${newsItems[0].id}/1200/900`"
+              :alt="newsItems[0].title"
+              loading="lazy"
+              class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.04]"
+            />
+            <!-- Gradient overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0A0D3D] via-[#0A0D3D]/70 to-transparent" />
+
+            <!-- Top label -->
+            <div class="absolute top-5 left-5 inline-flex items-center gap-2">
+              <span class="px-3 py-1 rounded-full bg-accent-500 text-primary-900 text-[10px] font-bold uppercase tracking-wider shadow-md">
+                {{ t('home.news_featured') }}
+              </span>
+              <span v-if="newsItems[0].category" class="px-3 py-1 rounded-full bg-white/15 backdrop-blur text-white text-[10px] font-semibold uppercase tracking-wider">
+                {{ newsItems[0].category.name }}
+              </span>
+            </div>
+
+            <!-- Bottom content -->
+            <div class="absolute inset-x-0 bottom-0 p-7 lg:p-9">
+              <h3 class="text-2xl lg:text-3xl xl:text-[34px] font-display font-bold text-white leading-[1.15] tracking-tight mb-3 line-clamp-3 group-hover:text-accent-300 transition-colors">
+                {{ newsItems[0].title }}
+              </h3>
+              <p v-if="newsItems[0].excerpt" class="hidden sm:block text-[14px] text-white/70 leading-relaxed line-clamp-2 mb-4">
+                {{ newsItems[0].excerpt }}
+              </p>
+              <div class="flex items-center gap-4 text-[12px] text-white/60">
+                <time>{{ fmtDate(newsItems[0].published_at) }}</time>
+                <span>·</span>
+                <span class="inline-flex items-center gap-1.5 font-semibold text-accent-300 group-hover:text-accent-200">
+                  {{ t('home.news_read') }}
+                  <ArrowRightIcon class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </div>
+            </div>
+          </RouterLink>
+
+          <!-- Side list — secondary news -->
+          <div class="space-y-3">
+            <RouterLink
+              v-for="(n, i) in newsItems.slice(1, 5)"
+              :key="n.id"
+              :to="`/news/${n.slug}`"
+              data-animate
+              :data-delay="i * 60"
+              class="group flex gap-4 p-3 lg:p-4 rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 hover:border-accent-300 dark:hover:border-accent-700 hover:shadow-[0_10px_30px_rgba(10,13,61,0.08)] transition-all duration-300"
+            >
+              <div class="w-24 lg:w-28 aspect-[4/3] rounded-xl overflow-hidden bg-surface-soft dark:bg-slate-700 flex-shrink-0">
+                <img
+                  :src="n.cover_image || `https://picsum.photos/seed/xiu-news${n.id}/300/225`"
+                  :alt="n.title"
+                  loading="lazy"
+                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                />
+              </div>
+              <div class="flex-1 min-w-0 flex flex-col py-1">
+                <p v-if="n.category" class="text-[10px] font-semibold uppercase tracking-wider text-accent-600 mb-1">
+                  {{ n.category.name }}
+                </p>
+                <h4 class="text-[14px] font-display font-bold text-ink-dark dark:text-white leading-snug line-clamp-2 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+                  {{ n.title }}
+                </h4>
+                <time class="mt-auto pt-2 text-[11px] text-ink-faint">{{ fmtDate(n.published_at) }}</time>
+              </div>
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         5. CAMPUS EDITORIAL
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24">
+      <div class="container-narrow">
+        <div class="grid lg:grid-cols-[1.3fr_1fr] gap-12 lg:gap-16 items-center">
+          <div class="grid grid-cols-3 gap-3 lg:gap-4" data-animate>
+            <div class="col-span-2 row-span-2 rounded-2xl overflow-hidden bg-surface-soft relative group">
+              <img
+                src="https://picsum.photos/seed/xiu-campus-main/800/800"
+                alt="XIU campus"
+                width="800" height="800"
+                loading="lazy"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-primary-900/30 via-transparent to-transparent" />
+              <button
+                class="absolute bottom-5 left-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur text-primary-900 text-xs font-semibold shadow-md hover:bg-white transition-colors"
+              >
+                <PlayIcon class="w-3.5 h-3.5" />
+                {{ t('home.campus_video') }}
+              </button>
+            </div>
+            <div class="aspect-square rounded-2xl overflow-hidden bg-surface-soft">
+              <img
+                src="https://picsum.photos/seed/xiu-campus-2/400/400"
+                alt="Library"
+                width="400" height="400"
+                loading="lazy"
+                class="w-full h-full object-cover hover:scale-[1.04] transition-transform duration-700"
+              />
+            </div>
+            <div class="aspect-square rounded-2xl overflow-hidden bg-surface-soft">
+              <img
+                src="https://picsum.photos/seed/xiu-campus-3/400/400"
+                alt="Students"
+                width="400" height="400"
+                loading="lazy"
+                class="w-full h-full object-cover hover:scale-[1.04] transition-transform duration-700"
+              />
+            </div>
+          </div>
+
+          <div data-animate data-delay="150">
+            <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+              {{ t('home.campus_eyebrow') }}
+            </p>
+            <h2 class="text-3xl md:text-4xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight mb-5">
+              {{ t('home.campus_title') }}
+            </h2>
+            <p class="text-[16px] text-ink-light dark:text-slate-400 leading-relaxed mb-7 max-w-md">
+              {{ t('home.campus_text') }}
+            </p>
+            <ul class="space-y-3 mb-8">
+              <li class="flex items-start gap-3 text-[14px] text-ink-medium dark:text-slate-300">
+                <span class="w-5 h-5 rounded-full bg-accent-100 dark:bg-accent-900/40 grid place-items-center flex-shrink-0 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-accent-500" />
+                </span>
+                {{ t('home.campus_li1') }}
+              </li>
+              <li class="flex items-start gap-3 text-[14px] text-ink-medium dark:text-slate-300">
+                <span class="w-5 h-5 rounded-full bg-accent-100 dark:bg-accent-900/40 grid place-items-center flex-shrink-0 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-accent-500" />
+                </span>
+                {{ t('home.campus_li2') }}
+              </li>
+              <li class="flex items-start gap-3 text-[14px] text-ink-medium dark:text-slate-300">
+                <span class="w-5 h-5 rounded-full bg-accent-100 dark:bg-accent-900/40 grid place-items-center flex-shrink-0 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-accent-500" />
+                </span>
+                {{ t('home.campus_li3') }}
+              </li>
+            </ul>
+            <RouterLink
+              to="/gallery"
+              class="group inline-flex items-center gap-2 text-sm font-semibold text-primary-700 dark:text-primary-300 hover:text-accent-600"
+            >
+              <span class="border-b border-current pb-0.5">{{ t('home.campus_link') }}</span>
+              <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         6. WHY XIU — 4 large cards
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24 relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50/40 dark:from-slate-900 dark:via-slate-900/50 dark:to-slate-900">
+      <!-- subtle dot pattern -->
+      <div
+        class="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style="background-image: radial-gradient(circle, #1A1F6E 1px, transparent 1px); background-size: 28px 28px;"
+      />
+      <div class="container-narrow relative">
+        <div class="max-w-2xl mb-14" data-animate>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+            {{ t('home.why_eyebrow') }}
+          </p>
+          <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">
+            {{ t('home.why_title') }}
+          </h2>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-5">
+          <article
+            v-for="(c, i) in whyCards"
+            :key="c.key"
+            data-animate
+            :data-delay="i * 80"
+            class="group p-7 lg:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 hover:border-accent-300 dark:hover:border-accent-700 hover:shadow-card-hover transition-all duration-300"
+          >
+            <div class="flex items-start gap-5">
+              <div :class="['w-12 h-12 rounded-xl grid place-items-center flex-shrink-0', c.iconBg]">
+                <component :is="c.icon" :class="['w-6 h-6', c.iconClr]" stroke-width="1.8" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline gap-2 mb-2">
+                  <span class="text-3xl font-display font-extrabold text-ink-dark dark:text-white tracking-tight">{{ c.number }}</span>
+                  <span class="text-xs text-ink-faint">{{ c.numberLabel }}</span>
+                </div>
+                <h3 class="text-lg font-display font-bold text-ink-dark dark:text-white mb-2 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+                  {{ t(c.titleKey) }}
+                </h3>
+                <p class="text-[14px] text-ink-light dark:text-slate-400 leading-relaxed">{{ t(c.descKey) }}</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         7. ACADEMIC — Faculties + sample programs (merged)
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24 lg:py-28 bg-surface-light dark:bg-slate-800/40 border-y border-surface-muted/60 dark:border-slate-800">
+      <div class="container-narrow">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
+          <div data-animate class="max-w-2xl">
+            <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+              {{ t('home.academic_eyebrow') }}
+            </p>
+            <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">
+              {{ t('home.academic_title') }}
+            </h2>
+            <p class="mt-4 text-[15px] text-ink-light dark:text-slate-400">{{ t('home.academic_lead') }}</p>
+          </div>
+          <RouterLink
+            to="/faculties"
+            class="hidden lg:inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 dark:text-primary-300 hover:text-accent-600 group whitespace-nowrap"
+          >
+            <span class="border-b border-current pb-0.5">{{ t('home.academic_all') }}</span>
+            <ArrowRightIcon class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+          </RouterLink>
+        </div>
+
+        <!-- Faculty filter tabs -->
+        <div class="flex flex-wrap items-center gap-2 mb-10" data-animate>
+          <button
+            v-for="f in faculties"
+            :key="f.slug"
+            type="button"
+            @click="activeFaculty = f.slug"
+            :class="[
+              'group inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all',
+              activeFaculty === f.slug
+                ? 'bg-primary-800 text-white shadow-md scale-[1.02]'
+                : 'bg-white dark:bg-slate-800 text-ink-medium dark:text-slate-300 border border-surface-muted dark:border-slate-700 hover:border-primary-300 hover:text-primary-700 dark:hover:text-primary-300'
+            ]"
+          >
+            <component :is="f.icon" class="w-4 h-4" stroke-width="1.8" />
+            <span>{{ f.name }}</span>
+            <span
+              :class="[
+                'text-[10px] px-1.5 py-0.5 rounded-md font-bold',
+                activeFaculty === f.slug
+                  ? 'bg-white/20 text-white'
+                  : 'bg-surface-soft dark:bg-slate-700 text-ink-faint'
+              ]"
+            >{{ f.programs.length }}</span>
+          </button>
+        </div>
+
+        <!-- Program cards (per active faculty) -->
+        <div :key="visibleFaculty.slug" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <article
+            v-for="(p, i) in visibleFaculty.programs"
+            :key="`${visibleFaculty.slug}-${i}`"
+            data-animate
+            :data-delay="i * 60"
+            :class="[
+              'group relative overflow-hidden rounded-2xl p-6 lg:p-7 ring-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(10,13,61,0.10)]',
+              p.bg,
+              p.ring
+            ]"
+          >
+            <!-- decorative blob -->
+            <div
+              :class="['absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity', p.iconBg]"
+            />
+
+            <div class="relative flex flex-col h-full">
+              <!-- icon -->
+              <div :class="['w-14 h-14 rounded-2xl grid place-items-center text-white shadow-lg mb-5', p.iconBg]">
+                <component :is="p.icon" class="w-7 h-7" stroke-width="1.7" />
+              </div>
+
+              <!-- title -->
+              <h3 class="text-lg font-display font-bold text-ink-dark dark:text-white leading-snug mb-4 group-hover:text-primary-800 dark:group-hover:text-white">
+                {{ p.name }}
+              </h3>
+
+              <!-- meta -->
+              <div class="mt-auto pt-4 border-t border-ink-dark/10 dark:border-white/10 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink-medium dark:text-slate-300">
+                <span class="inline-flex items-center gap-1 font-semibold">
+                  <ClockIcon class="w-3.5 h-3.5" /> {{ p.duration }}
+                </span>
+                <span class="text-ink-faint">·</span>
+                <span>{{ p.lang }}</span>
+                <span class="ml-auto px-2 py-0.5 rounded-md bg-white/70 dark:bg-slate-900/40 font-bold text-primary-800 dark:text-accent-400">
+                  {{ p.tuition }}
+                </span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- bottom CTA row -->
+        <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4" data-animate>
+          <RouterLink
+            to="/faculties"
+            class="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary-800 hover:bg-primary-900 text-white font-bold text-[14px] transition-all hover:scale-[1.02]"
+          >
+            {{ t('home.academic_cta') }}
+            <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          </RouterLink>
+          <a
+            href="https://admission.xiuedu.uz"
+            target="_blank"
+            rel="noopener"
+            class="text-[14px] font-semibold text-ink-light hover:text-accent-600 inline-flex items-center gap-1.5"
+          >
+            {{ t('home.cta_apply') }}
+            <ChevronRightIcon class="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         7. ADMISSION JOURNEY — 4 numbered steps
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24">
+      <div class="container-narrow">
+        <div class="text-center max-w-2xl mx-auto mb-16" data-animate>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+            {{ t('home.adm_eyebrow') }}
+          </p>
+          <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight mb-4">
+            {{ t('home.adm_title') }}
+          </h2>
+          <p class="text-[15px] text-ink-light dark:text-slate-400">{{ t('home.adm_lead') }}</p>
+        </div>
+
+        <div class="relative">
+          <!-- connecting line (desktop only) -->
+          <div class="hidden lg:block absolute left-0 right-0 top-[60px] h-px bg-gradient-to-r from-transparent via-accent-300 to-transparent" />
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4 relative">
+            <div
+              v-for="(s, i) in admissionSteps"
+              :key="i"
+              data-animate
+              :data-delay="i * 100"
+              class="relative text-center"
+            >
+              <!-- circle on the line -->
+              <div class="relative mx-auto w-[120px] h-[120px] mb-6">
+                <div class="absolute inset-0 rounded-full bg-white dark:bg-slate-900 border-2 border-surface-muted dark:border-slate-700 group-hover:border-accent-400 transition-colors" />
+                <div class="absolute inset-3 rounded-full bg-gradient-to-br from-primary-700 to-primary-900 grid place-items-center text-white shadow-lg">
+                  <component :is="s.icon" class="w-9 h-9" stroke-width="1.6" />
+                </div>
+                <div class="absolute -top-1 -right-1 w-9 h-9 rounded-full bg-accent-500 text-white text-xs font-bold grid place-items-center shadow-md ring-4 ring-white dark:ring-slate-900">
+                  {{ s.num }}
+                </div>
+              </div>
+              <h3 class="text-lg font-display font-bold text-ink-dark dark:text-white mb-2">{{ t(s.titleKey) }}</h3>
+              <p class="text-[13.5px] text-ink-light dark:text-slate-400 leading-relaxed max-w-[240px] mx-auto">
+                {{ t(s.descKey) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-14 text-center" data-animate>
+          <a
+            href="https://admission.xiuedu.uz"
+            target="_blank"
+            rel="noopener"
+            class="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-[15px] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+            style="background: linear-gradient(135deg, #FFB300 0%, #FF8C00 100%); color: #0A0D3D; box-shadow: 0 8px 32px rgba(255,179,0,0.30);"
+          >
+            {{ t('home.adm_cta') }}
+            <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         8. NUMBERS IN CONTEXT — storytelling stats
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24 bg-surface-light dark:bg-slate-800/40 border-y border-surface-muted/60 dark:border-slate-800">
+      <div class="container-narrow">
+        <div class="text-center max-w-2xl mx-auto mb-14" data-animate>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+            {{ t('home.numbers_eyebrow') }}
+          </p>
+          <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">
+            {{ t('home.numbers_title') }}
+          </h2>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div
+            v-for="(n, i) in numbersInContext"
+            :key="i"
+            data-animate
+            :data-delay="i * 80"
+            class="p-7 lg:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700"
+          >
+            <p class="text-4xl lg:text-5xl font-display font-extrabold text-primary-800 dark:text-accent-400 tracking-tight">{{ n.value }}</p>
+            <p class="mt-3 text-sm font-bold text-ink-dark dark:text-white">{{ n.label }}</p>
+            <p class="text-[12px] text-ink-light dark:text-slate-400 mt-0.5">{{ n.sub }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         9. UPCOMING EVENTS
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24">
+      <div class="container-narrow">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+          <div data-animate class="max-w-2xl">
+            <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+              {{ t('home.events_eyebrow') }}
+            </p>
+            <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">
+              {{ t('home.events_title') }}
+            </h2>
+            <p class="mt-4 text-[15px] text-ink-light dark:text-slate-400">{{ t('home.events_lead') }}</p>
+          </div>
+          <RouterLink
+            to="/events"
+            class="hidden lg:inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 dark:text-primary-300 hover:text-accent-600 group whitespace-nowrap"
+          >
+            <span class="border-b border-current pb-0.5">{{ t('home.events_all') }}</span>
+            <ArrowRightIcon class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+          </RouterLink>
+        </div>
+
+        <div v-if="eventItems.length" class="grid md:grid-cols-3 gap-5">
+          <RouterLink
+            v-for="(e, i) in eventItems"
+            :key="e.id"
+            :to="`/events/${e.slug}`"
+            data-animate
+            :data-delay="i * 80"
+            class="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 hover:border-accent-300 dark:hover:border-accent-700 hover:shadow-card-hover transition-all duration-300"
+          >
+            <div class="aspect-[16/10] relative bg-surface-soft dark:bg-slate-700 overflow-hidden">
+              <img
+                :src="e.cover_image || `https://picsum.photos/seed/xiu-event${e.id}/800/500`"
+                :alt="e.title"
+                width="800" height="500"
+                loading="lazy"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-primary-900/40 via-transparent to-transparent" />
+              <!-- date badge -->
+              <div class="absolute top-4 left-4 bg-white dark:bg-slate-900 rounded-xl px-3 py-2 text-center shadow-md min-w-[60px]">
+                <div class="text-xl font-display font-extrabold text-primary-800 dark:text-accent-400 leading-none">{{ dayPart(e.starts_at) }}</div>
+                <div class="text-[10px] font-bold text-ink-faint mt-0.5 tracking-wider">{{ monthPart(e.starts_at) }}</div>
+              </div>
+            </div>
+            <div class="p-5">
+              <h3 class="text-base font-display font-bold text-ink-dark dark:text-white leading-snug line-clamp-2 mb-3 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+                {{ e.title }}
+              </h3>
+              <div class="flex items-center gap-2 text-[12px] text-ink-light dark:text-slate-400">
+                <MapPinIcon class="w-3.5 h-3.5 flex-shrink-0" />
+                <span class="truncate">{{ e.location || t('home.events_tba') }}</span>
+              </div>
+            </div>
+          </RouterLink>
+        </div>
+
+        <!-- empty state -->
+        <div v-else class="rounded-2xl bg-white dark:bg-slate-800 border border-dashed border-surface-muted dark:border-slate-700 p-12 text-center">
+          <CalendarDaysIcon class="w-10 h-10 mx-auto text-ink-faint mb-3" />
+          <p class="text-sm font-semibold text-ink-medium dark:text-slate-300">{{ t('home.events_empty') }}</p>
+          <RouterLink to="/events" class="mt-2 inline-block text-[13px] font-semibold text-accent-600 hover:underline">
+            {{ t('home.events_all') }}
+          </RouterLink>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         11. TESTIMONIALS
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24 bg-surface-light dark:bg-slate-800/40 border-y border-surface-muted/60 dark:border-slate-800">
+      <div class="container-narrow">
+        <div class="text-center max-w-2xl mx-auto mb-14" data-animate>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+            {{ t('home.test_eyebrow') }}
+          </p>
+          <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">
+            {{ t('home.test_title') }}
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-5">
+          <article
+            v-for="(t_, i) in testimonials"
+            :key="t_.id"
+            data-animate
+            :data-delay="i * 100"
+            class="p-7 lg:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 flex flex-col"
+          >
+            <svg class="w-8 h-8 text-accent-300 mb-4" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+              <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z"/>
+            </svg>
+            <p class="text-[15px] text-ink-medium dark:text-slate-300 leading-[1.7] flex-1">{{ t(t_.textKey) }}</p>
+            <div class="mt-6 pt-6 border-t border-surface-muted dark:border-slate-700 flex items-center gap-3">
+              <img
+                :src="t_.avatar"
+                :alt="t(t_.nameKey)"
+                width="48" height="48"
+                loading="lazy"
+                class="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <p class="text-sm font-bold text-ink-dark dark:text-white">{{ t(t_.nameKey) }}</p>
+                <p class="text-[12px] text-ink-light">{{ t(t_.roleKey) }}</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         13. INTERNATIONAL PARTNERS
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24">
+      <div class="container-narrow">
+        <div class="text-center max-w-2xl mx-auto mb-14" data-animate>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+            {{ t('home.partners_eyebrow') }}
+          </p>
+          <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight mb-4">
+            {{ t('home.partners_title_h') }}
+          </h2>
+          <p class="text-[15px] text-ink-light dark:text-slate-400">{{ t('home.partners_lead') }}</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" data-animate data-delay="100">
+          <div
+            v-for="p in partners"
+            :key="p.country"
+            class="group flex items-center gap-3 px-4 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 hover:border-accent-300 dark:hover:border-accent-700 hover:-translate-y-0.5 transition-all"
+          >
+            <span class="text-2xl flex-shrink-0">{{ p.flag }}</span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px] font-bold text-ink-dark dark:text-white truncate">{{ p.country }}</p>
+              <p class="text-[10.5px] text-ink-faint">{{ p.count }} {{ t('home.partners_count') }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-12 text-center" data-animate>
+          <RouterLink
+            to="/international"
+            class="group inline-flex items-center gap-2 text-sm font-semibold text-primary-700 dark:text-primary-300 hover:text-accent-600"
+          >
+            <span class="border-b border-current pb-0.5">{{ t('home.partners_link') }}</span>
+            <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          </RouterLink>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         14. LICENSES & ACCREDITATION (A4 documents)
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24 bg-surface-light dark:bg-slate-800/40 border-y border-surface-muted/60 dark:border-slate-800">
+      <div class="container-narrow">
+        <div class="text-center max-w-2xl mx-auto mb-14" data-animate>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+            {{ t('home.licenses_eyebrow') }}
+          </p>
+          <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight mb-4">
+            {{ t('home.recognition_title') }}
+          </h2>
+          <p class="text-[15px] text-ink-light dark:text-slate-400">{{ t('home.recognition_lead') }}</p>
+        </div>
+
+        <!-- A4-aspect document cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <button
+            v-for="(lic, i) in licenses"
+            :key="i"
+            type="button"
+            data-animate
+            :data-delay="i * 80"
+            class="group text-left focus:outline-none"
+            @click="openLicense(i)"
+          >
+            <!-- A4 paper (210 × 297 = 1 : 1.4142 aspect) -->
+            <div
+              class="relative overflow-hidden rounded-md bg-white shadow-[0_8px_30px_rgba(10,13,61,0.15)] group-hover:shadow-[0_18px_50px_rgba(10,13,61,0.25)] group-hover:-translate-y-1.5 transition-all duration-300"
+              style="aspect-ratio: 1 / 1.4142;"
+            >
+              <!-- Subtle paper border -->
+              <div class="absolute inset-0 ring-1 ring-black/[0.06] rounded-md pointer-events-none z-10" />
+
+              <img
+                :src="lic.image"
+                :alt="lic.title"
+                loading="lazy"
+                class="absolute inset-0 w-full h-full object-cover"
+              />
+
+              <!-- Bottom dark overlay with title -->
+              <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-[#0A0D3D]/95 via-[#0A0D3D]/70 to-transparent">
+                <p class="text-[13px] font-display font-bold text-white leading-tight line-clamp-2">{{ lic.title }}</p>
+                <p class="text-[10px] text-white/65 mt-1 truncate">{{ lic.issuer }} · {{ lic.year }}</p>
+              </div>
+
+              <!-- Hover magnifier hint -->
+              <div class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 backdrop-blur grid place-items-center shadow-md opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+                <ArrowsPointingOutIcon class="w-4 h-4 text-primary-800" />
+              </div>
+
+              <!-- Year badge -->
+              <div class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-accent-500 text-primary-900 text-[10px] font-bold tracking-wider shadow-md">
+                {{ lic.year }}
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <p class="text-center text-[12px] text-ink-faint mt-8" data-animate>
+          {{ t('home.licenses_hint') }}
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         15. FAQ
+    ════════════════════════════════════════════════════════════ -->
+    <section class="py-24">
+      <div class="container-narrow max-w-3xl">
+        <div class="text-center mb-12" data-animate>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">
+            {{ t('home.faq_eyebrow') }}
+          </p>
+          <h2 class="text-3xl md:text-4xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">
+            {{ t('home.faq_title') }}
+          </h2>
+        </div>
+
+        <div class="space-y-3" data-animate data-delay="100">
+          <div
+            v-for="(item, i) in faqs"
+            :key="i"
+            class="border border-surface-muted dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800"
+          >
+            <button
+              type="button"
+              @click="toggleFaq(i)"
+              :aria-expanded="openFaq === i"
+              class="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-surface-light dark:hover:bg-slate-800/80 transition-colors"
+            >
+              <span class="text-[15px] font-semibold text-ink-dark dark:text-white">{{ t(item.q) }}</span>
+              <ChevronDownIcon
+                :class="['w-5 h-5 text-ink-faint flex-shrink-0 transition-transform duration-200', openFaq === i && 'rotate-180']"
+              />
+            </button>
+            <div
+              v-show="openFaq === i"
+              class="px-6 pb-5 text-[14px] text-ink-light dark:text-slate-400 leading-relaxed border-t border-surface-muted dark:border-slate-700 pt-4"
+            >
+              {{ t(item.a) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         16. FINAL CTA
+    ════════════════════════════════════════════════════════════ -->
+    <section
+      class="relative overflow-hidden py-24 lg:py-32"
+      style="background: linear-gradient(135deg, #0A0D3D 0%, #1A1F6E 50%, #2D3A8C 100%);"
+    >
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="background:
+          radial-gradient(circle at 25% 50%, rgba(80,100,210,0.30) 0%, transparent 50%),
+          radial-gradient(circle at 75% 50%, rgba(255,179,0,0.18) 0%, transparent 50%);"
+      />
+      <div
+        class="absolute inset-0 opacity-[0.05] pointer-events-none"
+        style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 32px 32px;"
+      />
+      <div class="relative container-narrow">
+        <div class="max-w-3xl mx-auto text-center">
+          <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-400 mb-4" data-animate>
+            {{ t('home.final_cta_eyebrow') }}
+          </p>
+          <h2
+            class="text-4xl md:text-5xl xl:text-6xl font-display font-bold text-white leading-[1.1] tracking-tight mb-5"
+            data-animate
+            data-delay="100"
+          >
+            {{ t('home.final_cta_title') }}
+          </h2>
+          <p class="text-[17px] text-white/65 mb-10 max-w-xl mx-auto" data-animate data-delay="200">
+            {{ t('home.final_cta_text') }}
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-5" data-animate data-delay="300">
+            <a
+              href="https://admission.xiuedu.uz"
+              target="_blank"
+              rel="noopener"
+              class="group inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-[15px] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+              style="background: linear-gradient(135deg, #FFB300 0%, #FF8C00 100%); color: #0A0D3D; box-shadow: 0 8px 32px rgba(255,179,0,0.45);"
+            >
+              {{ t('home.final_cta_apply') }}
+              <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </a>
+            <a
+              href="tel:+998554061515"
+              class="group inline-flex items-center gap-2 text-[15px] font-semibold text-white/85 hover:text-accent-400 transition"
+            >
+              <PhoneIcon class="w-4 h-4" />
+              <span>+998 55 406-15-15</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== License Lightbox ===== -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200"
+        enter-from-class="opacity-0"
+        leave-active-class="transition duration-150"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="licenseOpen"
+          class="fixed inset-0 z-[120] bg-[#0A0D3D]/95 backdrop-blur-sm flex items-center justify-center p-6"
+          @click.self="closeLicense"
+        >
+          <button
+            type="button"
+            class="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white grid place-items-center"
+            @click="closeLicense"
+          >
+            <XMarkIcon class="w-5 h-5" />
+          </button>
+          <button
+            v-if="licenses.length > 1"
+            type="button"
+            class="absolute left-5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white grid place-items-center"
+            @click="prevLicense"
+          >
+            <ChevronLeftIcon class="w-5 h-5" />
+          </button>
+          <button
+            v-if="licenses.length > 1"
+            type="button"
+            class="absolute right-5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white grid place-items-center"
+            @click="nextLicense"
+          >
+            <ChevronRightIcon class="w-5 h-5" />
+          </button>
+
+          <div class="relative max-w-[90vw] max-h-[88vh] flex flex-col items-center">
+            <img
+              :src="licenses[licenseIdx].image"
+              :alt="licenses[licenseIdx].title"
+              class="rounded-md shadow-[0_30px_80px_rgba(0,0,0,0.6)] max-h-[78vh] w-auto bg-white"
+              style="aspect-ratio: 1 / 1.4142;"
+            />
+            <div class="mt-5 text-center">
+              <p class="text-base font-display font-bold text-white">{{ licenses[licenseIdx].title }}</p>
+              <p class="text-[12px] text-white/60 mt-1">{{ licenses[licenseIdx].issuer }} · {{ licenses[licenseIdx].year }}</p>
+            </div>
+          </div>
+
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-xs">
+            {{ licenseIdx + 1 }} / {{ licenses.length }}
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+  </div>
+</template>
+
+<style scoped>
+.hero-enter {
+  opacity: 0;
+  animation: hero-fade-up 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>

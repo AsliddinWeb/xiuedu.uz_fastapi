@@ -1,0 +1,38 @@
+{
+  "name": "xiuedu-frontend",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 5176",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@heroicons/vue": "^2.1.5",
+    "@vueuse/core": "^11.3.0",
+    "@vueuse/head": "^2.0.0",
+    "axios": "^1.14.0",
+    "dompurify": "^3.3.3",
+    "lucide-vue-next": "^0.447.0",
+    "pinia": "^2.2.4",
+    "vue": "^3.5.10",
+    "vue-i18n": "^10.0.4",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vue/test-utils": "^2.4.6",
+    "autoprefixer": "^10.4.20",
+    "happy-dom": "^15.7.4",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.8",
+    "vitest": "^2.1.2"
+  }
+}

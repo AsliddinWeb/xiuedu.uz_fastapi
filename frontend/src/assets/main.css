@@ -1,0 +1,287 @@
+/* ===== Google Fonts ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DESIGN TOKENS — CSS custom properties
+   ============================================================ */
+@layer base {
+  :root {
+    /* Brand — Indigo Navy + Golden Yellow (uobs.uz inspired) */
+    --color-primary:        #1A1F6E;
+    --color-primary-dark:   #0A0D3D;
+    --color-primary-light:  #EEF0FF;
+    --color-accent:         #FFB300;
+    --color-accent-glow:    #FFC107;
+    --color-accent-light:   #FFF9E6;
+    --hero-dark:            #0A0D3D;
+    --hero-mid:             #1A1F6E;
+    --hero-light:           #2D3A8C;
+    --hero-glow:            rgba(80,100,210,0.35);
+
+    /* Surface */
+    --color-bg:             #F5F7FF;
+    --color-surface:        #FFFFFF;
+    --color-border:         #E2E8F0;
+    --color-border-light:   #F1F5F9;
+
+    /* Text */
+    --color-text:           #0F172A;
+    --color-text-muted:     #64748B;
+    --color-text-faint:     #94A3B8;
+
+    /* Nav */
+    --nav-height: 72px;
+    --nav-bg: rgba(255,255,255,0.95);
+    --nav-shadow: 0 2px 20px rgba(15,26,64,0.08);
+
+    color-scheme: light;
+  }
+
+  .dark {
+    --color-bg:           #0F172A;
+    --color-surface:      #1E293B;
+    --color-border:       #334155;
+    --color-border-light: #1E293B;
+    --color-text:         #F1F5F9;
+    --color-text-muted:   #94A3B8;
+    --color-text-faint:   #475569;
+    --nav-bg: rgba(15,23,42,0.97);
+    --nav-shadow: 0 2px 20px rgba(0,0,0,0.30);
+
+    color-scheme: dark;
+  }
+
+  html {
+    @apply scroll-smooth;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-surface-light text-ink-dark font-sans antialiased;
+  }
+  .dark body {
+    @apply bg-[#0F172A] text-slate-100;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
+  }
+
+  ::selection { background: #C7D2FE; color: #1B2B5E; }
+  .dark ::selection { background: #2E4A9E; color: #EEF2FF; }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-400 ring-offset-2 ring-offset-white dark:ring-offset-[#0F172A] rounded;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-200 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-400;
+  }
+  .dark ::-webkit-scrollbar-thumb { @apply bg-primary-700; }
+  .dark ::-webkit-scrollbar-thumb:hover { @apply bg-primary-500; }
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #C7D2FE transparent;
+  }
+  .dark html {
+    scrollbar-color: #1B2B5E transparent;
+  }
+}
+
+/* ============================================================
+   COMPONENT CLASSES
+   ============================================================ */
+@layer components {
+  /* ----- Containers ----- */
+  .container-wide   { @apply container mx-auto max-w-7xl; }
+  .container-narrow { @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8; }
+  .container-fluid  { @apply w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20; }
+
+  /* ----- Buttons ----- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-lg
+           transition-all duration-200 cursor-pointer select-none
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+  .btn-primary  { @apply btn bg-primary-600 text-white hover:bg-primary-700 shadow-button focus-visible:ring-primary-500 active:scale-[0.98]; }
+  .btn-accent   { @apply btn bg-accent-500 text-white hover:bg-accent-600 shadow-button-accent focus-visible:ring-accent-400 active:scale-[0.98]; }
+  .btn-outline  { @apply btn border-2 border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus-visible:ring-primary-500; }
+  .btn-ghost    { @apply btn text-ink-medium hover:bg-surface-soft hover:text-ink-dark dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white; }
+  .btn-danger   { @apply btn bg-danger text-white hover:bg-danger-dark focus-visible:ring-red-500; }
+  .btn-sm       { @apply px-3 py-1.5 text-sm; }
+  .btn-md       { @apply px-5 py-2.5 text-sm; }
+  .btn-lg       { @apply px-7 py-3.5 text-base; }
+
+  /* ----- Cards ----- */
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-xl shadow-card
+           border border-surface-muted dark:border-slate-700;
+  }
+  .card-hover {
+    @apply card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  /* ----- Sections ----- */
+  .section          { @apply py-16 md:py-24; }
+  .section-title    { @apply text-3xl md:text-4xl font-display font-bold text-primary-800 dark:text-white; }
+  .section-subtitle { @apply mt-4 text-lg text-ink-light dark:text-slate-400 max-w-2xl; }
+  .section-eyebrow  { @apply text-xs font-semibold uppercase tracking-[0.2em] text-accent-500; }
+
+  /* ----- Badges ----- */
+  .badge          { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold; }
+  .badge-primary  { @apply badge bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300; }
+  .badge-accent   { @apply badge bg-accent-100 text-accent-700 dark:bg-accent-900/40 dark:text-accent-300; }
+  .badge-success  { @apply badge bg-success-light text-success-dark dark:bg-green-900/40 dark:text-green-300; }
+  .badge-warning  { @apply badge bg-warning-light text-warning-dark dark:bg-amber-900/40 dark:text-amber-300; }
+  .badge-danger   { @apply badge bg-danger-light text-danger-dark dark:bg-red-900/40 dark:text-red-300; }
+  .badge-info     { @apply badge bg-info-light text-info-dark dark:bg-blue-900/40 dark:text-blue-300; }
+
+  /* ----- Inputs ----- */
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-surface-muted bg-white
+           dark:bg-slate-800 dark:border-slate-600
+           text-ink-dark dark:text-slate-100
+           placeholder-ink-faint
+           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent
+           transition-all duration-200;
+  }
+
+  /* ----- Nav links ----- */
+  .nav-link {
+    @apply relative text-sm font-medium text-ink-medium dark:text-slate-300
+           hover:text-primary-700 dark:hover:text-white transition-colors duration-150;
+  }
+  .nav-link.active { @apply text-primary-700 dark:text-white; }
+  .nav-link.active::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 right-0 h-0.5 bg-accent-500 rounded-full;
+  }
+
+  /* ----- Misc ----- */
+  .divider       { @apply border-t border-surface-muted dark:border-slate-700; }
+  .text-gradient { @apply bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent; }
+}
+
+/* ============================================================
+   SCROLL-IN ANIMATIONS  (paired with useScrollAnimation)
+   ============================================================ */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+[data-animate].animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-animate][data-delay="100"] { transition-delay: 0.10s; }
+[data-animate][data-delay="200"] { transition-delay: 0.20s; }
+[data-animate][data-delay="300"] { transition-delay: 0.30s; }
+[data-animate][data-delay="400"] { transition-delay: 0.40s; }
+[data-animate][data-delay="500"] { transition-delay: 0.50s; }
+[data-animate][data-delay="600"] { transition-delay: 0.60s; }
+
+/* ============================================================
+   HERO ANIMATIONS (keyframes)
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes heroEnter {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-enter {
+    opacity: 0;
+    will-change: opacity, transform;
+    animation: heroEnter 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes blobOrb {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(3%, -4%) scale(1.05); }
+    66%  { transform: translate(-3%, 3%) scale(0.97); }
+    100% { transform: translate(2%, -2%) scale(1.02); }
+  }
+  .blob-orb {
+    position: absolute;
+    border-radius: 9999px;
+    will-change: transform;
+    animation: blobOrb 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  .float-card    { will-change: transform; animation: floatCard 6s ease-in-out infinite; }
+  .float-card-sm { will-change: transform; animation: floatCard 7s ease-in-out infinite; }
+  .float-card-sm:nth-child(2) { animation-duration: 8s; animation-delay: -2s; }
+
+  @keyframes scrollDot {
+    0%   { opacity: 1; transform: translateY(0); }
+    80%  { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 0; transform: translateY(10px); }
+  }
+  .animate-scroll-dot { animation: scrollDot 1.8s ease-in-out infinite; }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    animation: marquee 30s linear infinite;
+    width: max-content;
+    will-change: transform;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .blob-orb, .float-card, .float-card-sm, .animate-scroll-dot, .marquee-track {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-animate] { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   Print styles
+   ============================================================ */
+@media print {
+  header, footer, nav, .no-print { display: none !important; }
+  body { background: white !important; color: black !important; font-size: 11pt; }
+  a { color: black !important; text-decoration: underline !important; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #555; }
+  .container-wide, .container-narrow { max-width: 100% !important; }
+  .card, .shadow-card, .shadow-soft { box-shadow: none !important; border: 1px solid #ccc !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  img { max-width: 100% !important; page-break-inside: avoid; }
+}
