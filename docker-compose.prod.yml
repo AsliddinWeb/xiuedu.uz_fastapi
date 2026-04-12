@@ -1,16 +1,8 @@
 # ════════════════════════════════════════════════════════════════
-#  XIU Edu — Production deploy
+#  XIU Edu — Production (LXC-compatible)
 #
-#  DB is EXTERNAL (not in Docker).
-#  Unique ports (conflict-free with other projects):
-#    nginx  → 8100 (HTTP) / 8443 (HTTPS)
-#    redis  → 6382 (host-only)
-#    backend → 8114 (host-only)
-#
-#  Server's main nginx (80/443) → proxy_pass to 8100/8443
-#
-#  Usage:
-#    docker compose -f docker-compose.prod.yml up -d --build
+#  Portlar: nginx=8100, backend=8114, redis=ichki
+#  Server nginx (80/443) → proxy_pass 127.0.0.1:8100
 # ════════════════════════════════════════════════════════════════
 
 services:
@@ -21,8 +13,8 @@ services:
     command: ["redis-server", "--appendonly", "yes", "--maxmemory", "128mb"]
     volumes:
       - xiuedu_redisdata:/data
-    ports:
-      - "127.0.0.1:6382:6379"
+    expose:
+      - "6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -30,6 +22,8 @@ services:
       retries: 5
     networks:
       - xiuedu_prod_net
+    security_opt:
+      - no-new-privileges:true
 
   backend:
     build:
@@ -45,10 +39,12 @@ services:
         condition: service_healthy
     volumes:
       - xiuedu_mediadata:/app/media
-    ports:
-      - "127.0.0.1:8114:8014"
+    expose:
+      - "8014"
     networks:
       - xiuedu_prod_net
+    security_opt:
+      - no-new-privileges:true
 
   frontend:
     build:
@@ -57,6 +53,8 @@ services:
     container_name: xiuedu_frontend_builder
     volumes:
       - xiuedu_frontend_dist:/app/dist
+    security_opt:
+      - no-new-privileges:true
 
   nginx:
     image: nginx:1.27-alpine
@@ -69,9 +67,11 @@ services:
       - xiuedu_frontend_dist:/var/www/frontend:ro
       - xiuedu_mediadata:/var/www/media:ro
     ports:
-      - "127.0.0.1:8100:80"
+      - "8100:80"
     networks:
       - xiuedu_prod_net
+    security_opt:
+      - no-new-privileges:true
 
 volumes:
   xiuedu_redisdata:
