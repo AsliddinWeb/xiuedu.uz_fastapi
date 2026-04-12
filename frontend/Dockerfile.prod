@@ -1,9 +1,9 @@
-# Frontend production build — outputs static files to /app/dist
+# Frontend production build
 FROM node:20-alpine AS builder
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install --ignore-scripts && npm install @rollup/rollup-linux-x64-musl --save-optional
 COPY . .
 
 ARG VITE_API_BASE_URL=https://xiuedu.uz/api
@@ -13,8 +13,6 @@ ENV VITE_SITE_URL=$VITE_SITE_URL
 
 RUN npm run build
 
-# Final stage — just copy dist (nginx will serve it)
 FROM alpine:3.19
 COPY --from=builder /app/dist /app/dist
-# Container exits immediately — dist is in the volume
-CMD ["echo", "Frontend built successfully"]
+CMD ["echo", "Frontend built"]
