@@ -24,3 +24,5 @@ dist/
 # Media uploads
 backend/media/*
 !backend/media/.gitkeep
+.env.prod
+.env
