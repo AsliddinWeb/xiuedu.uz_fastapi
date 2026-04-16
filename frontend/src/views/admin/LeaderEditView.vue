@@ -10,13 +10,18 @@ import { AdminLeadersAPI } from '@/api/admin'
 import UIButton from '@/components/ui/UIButton.vue'
 import MultilingualInput from '@/components/admin/MultilingualInput.vue'
 import MediaPicker from '@/components/admin/MediaPicker.vue'
-import { useToast } from '@/composables/useToast'
-import { useConfirm } from '@/composables/useConfirm'
 
 const route = useRoute()
 const router = useRouter()
-const toast = useToast()
-const confirm = useConfirm()
+
+// Simple inline toast (no Pinia dependency)
+const toastMsg = ref('')
+const toastType = ref('success')
+function toast(msg, type = 'success') {
+  toastMsg.value = msg
+  toastType.value = type
+  setTimeout(() => { toastMsg.value = '' }, 3000)
+}
 
 const isNew = computed(() => route.params.id === 'new' || !route.params.id)
 const loading = ref(!isNew.value)
@@ -40,7 +45,7 @@ async function load() {
     const data = await AdminLeadersAPI.get(route.params.id)
     Object.assign(form, data)
   } catch (_) {
-    toast.error('Yuklab bo\'lmadi')
+    toast('Yuklab bo\'lmadi', 'error')
     router.push('/admin/leaders')
   } finally {
     loading.value = false
@@ -50,7 +55,7 @@ onMounted(load)
 
 async function save() {
   if (!form.name_uz) {
-    toast.error("Ism (UZ) bo'sh bo'lmasligi kerak")
+    toast("Ism (UZ) bo'sh bo'lmasligi kerak", 'error')
     return
   }
   saving.value = true
@@ -58,29 +63,23 @@ async function save() {
     const { id, created_at, updated_at, ...payload } = form
     if (isNew.value) {
       const created = await AdminLeadersAPI.create(payload)
-      toast.success('Yaratildi')
+      toast('Yaratildi')
       router.replace(`/admin/leaders/${created.id}`)
     } else {
       await AdminLeadersAPI.update(route.params.id, payload)
-      toast.success('Saqlandi')
+      toast('Saqlandi')
     }
   } catch (e) {
-    toast.error(e?.response?.data?.detail || 'Saqlashda xatolik')
+    toast(e?.response?.data?.detail || 'Saqlashda xatolik', 'error')
   } finally {
     saving.value = false
   }
 }
 
 async function remove() {
-  const ok = await confirm({
-    title: "O'chirish",
-    message: `"${form.name_uz}" o'chiriladi. Davom etilsinmi?`,
-    confirmLabel: "O'chirish",
-    danger: true
-  })
-  if (!ok) return
+  if (!window.confirm(`"${form.name_uz}" o'chiriladi. Davom etilsinmi?`)) return
   await AdminLeadersAPI.remove(route.params.id)
-  toast.success("O'chirildi")
+  toast("O'chirildi")
   router.push('/admin/leaders')
 }
 </script>
@@ -105,6 +104,15 @@ async function remove() {
         Saqlash
       </UIButton>
     </div>
+
+    <!-- Inline toast -->
+    <Transition enter-active-class="transition duration-300" enter-from-class="opacity-0 -translate-y-2"
+                leave-active-class="transition duration-200" leave-to-class="opacity-0">
+      <div v-if="toastMsg" :class="['fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold',
+                                     toastType === 'error' ? 'bg-danger text-white' : 'bg-success text-white']">
+        {{ toastMsg }}
+      </div>
+    </Transition>
 
     <div v-if="loading" class="text-center py-12 text-ink-faint">Yuklanmoqda...</div>
 
