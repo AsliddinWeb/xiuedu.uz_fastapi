@@ -20,8 +20,6 @@ const props = defineProps({
   required:   Boolean,
   placeholder: String
 })
-const emit = defineEmits(['update:modelValue'])
-
 const lang = ref('uz')
 const tabs = [
   { key: 'uz', label: 'UZ' },
@@ -30,7 +28,8 @@ const tabs = [
 ]
 
 function update(code, val) {
-  emit('update:modelValue', { ...props.modelValue, [`${props.base}_${code}`]: val })
+  // Directly mutate the reactive object — no spread (keeps reactivity)
+  props.modelValue[`${props.base}_${code}`] = val
 }
 </script>
 
