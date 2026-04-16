@@ -24,18 +24,24 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('vue-i18n')) return 'vendor-i18n'
-            if (id.includes('@vueuse'))   return 'vendor-vueuse'
-            if (id.includes('lucide'))    return 'vendor-icons'
-            if (id.includes('axios'))     return 'vendor-axios'
-            if (id.includes('dompurify')) return 'vendor-dompurify'
+            if (id.includes('vue-i18n'))   return 'vendor-i18n'
+            if (id.includes('@vueuse'))    return 'vendor-vueuse'
+            if (id.includes('lucide'))     return 'vendor-icons'
+            if (id.includes('axios'))      return 'vendor-axios'
+            if (id.includes('dompurify'))  return 'vendor-dompurify'
             if (id.includes('vue-router')) return 'vendor-router'
-            if (id.includes('pinia'))     return 'vendor-pinia'
-            if (id.includes('vue'))       return 'vendor-vue'
+            if (id.includes('pinia'))      return 'vendor-pinia'
+            if (id.includes('vue'))        return 'vendor-vue'
             return 'vendor'
           }
-          if (id.includes('/views/admin/') || id.includes('/components/layout/AdminLayout')) return 'app-admin'
-          if (id.includes('/views/public/') || id.includes('/components/sections/')) return 'app-public'
+          // Shared files (api, components, stores, utils) — o'z chunk'iga
+          // Admin va Public ularni import qiladi — circular dependency bo'lmaydi
+          if (id.includes('/api/'))        return 'shared-api'
+          if (id.includes('/stores/'))     return 'shared-stores'
+          if (id.includes('/utils/'))      return 'shared-utils'
+          if (id.includes('/composables/')) return 'shared-composables'
+          if (id.includes('/components/admin/')) return 'shared-admin-components'
+          if (id.includes('/components/cards/')) return 'shared-cards'
         }
       }
     }
