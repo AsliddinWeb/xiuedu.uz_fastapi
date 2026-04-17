@@ -219,6 +219,46 @@ const showQuote     = computed(() => form.variant === 'split')
       <MultilingualInput v-model="form" base="quote_author" label="Muallif"        placeholder="Madina K. — Bitiruvchi 2024" />
     </div>
 
+    <!-- Floating badge cards -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 p-5 mb-5 space-y-4">
+      <p class="text-xs font-bold uppercase tracking-wider text-ink-faint">Floating badge cardlar (foto ustida)</p>
+      <p class="text-[11px] text-ink-faint">Split variantda foto yuqori-o'ng va pastki-chap burchakda ko'rinadigan kichik cardlar.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4 p-4 rounded-xl bg-surface-soft dark:bg-slate-900/30">
+        <p class="sm:col-span-2 text-[11px] font-bold uppercase tracking-wider text-accent-600">Badge 1 (yuqori-o'ng)</p>
+        <div>
+          <label class="block text-sm font-medium text-ink-medium mb-1.5">Qiymat</label>
+          <input type="text" v-model="form.badge1_value" placeholder="TOP-3"
+                 class="w-full h-10 px-3 rounded-lg border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-ink-medium mb-1.5">Icon (heroicon)</label>
+          <input type="text" v-model="form.badge1_icon" placeholder="StarIcon"
+                 class="w-full h-10 px-3 rounded-lg border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+        </div>
+        <div class="sm:col-span-2">
+          <MultilingualInput v-model="form" base="badge1_label" label="Label" placeholder="O'zbekiston reytingida" />
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 p-4 rounded-xl bg-surface-soft dark:bg-slate-900/30">
+        <p class="sm:col-span-2 text-[11px] font-bold uppercase tracking-wider text-accent-600">Badge 2 (pastki-chap)</p>
+        <div>
+          <label class="block text-sm font-medium text-ink-medium mb-1.5">Qiymat</label>
+          <input type="text" v-model="form.badge2_value" placeholder="95%"
+                 class="w-full h-10 px-3 rounded-lg border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-ink-medium mb-1.5">Icon (heroicon)</label>
+          <input type="text" v-model="form.badge2_icon" placeholder="BriefcaseIcon"
+                 class="w-full h-10 px-3 rounded-lg border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+        </div>
+        <div class="sm:col-span-2">
+          <MultilingualInput v-model="form" base="badge2_label" label="Label" placeholder="Bitiruvchilar ish bilan" />
+        </div>
+      </div>
+    </div>
+
     <!-- Decorative toggles -->
     <div class="rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 p-5 mb-5">
       <p class="text-xs font-bold uppercase tracking-wider text-ink-faint mb-3">Dekorativ elementlar</p>
