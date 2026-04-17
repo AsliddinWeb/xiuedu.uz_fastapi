@@ -103,6 +103,9 @@ class HeroSettings(Base):
     badge2_label_en: Mapped[str | None] = mapped_column(String(120), nullable=True)
     badge2_icon:  Mapped[str | None] = mapped_column(String(60), nullable=True)
 
+    # Trust badges strip (under CTAs) — array of {label, sub_uz, sub_ru, sub_en, icon}
+    trust_badges: Mapped[list] = mapped_column(JSONField, default=list, server_default="[]", nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

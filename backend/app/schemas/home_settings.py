@@ -88,6 +88,8 @@ class HeroBase(BaseModel):
     badge2_label_en: str | None = None
     badge2_icon: str | None = None
 
+    trust_badges: list[dict] = []
+
 
 class HeroUpdate(HeroBase):
     pass
@@ -139,6 +141,8 @@ class HeroPublicOut(BaseModel):
     badge2_value: str | None
     badge2_label: str | None
     badge2_icon: str | None
+
+    trust_badges: list[dict]
 
 
 # ══════════════════════════════════════════════════════════

@@ -87,6 +87,10 @@ def _hero_public(h: HeroSettings | None, lang: Lang) -> HeroPublicOut | None:
         badge2_value=h.badge2_value,
         badge2_label=pick(h, "badge2_label", lang),
         badge2_icon=h.badge2_icon,
+        trust_badges=[
+            {"label": b.get("label", ""), "sub": b.get(f"sub_{lang}") or b.get("sub_uz", ""), "icon": b.get("icon", "ShieldCheckIcon")}
+            for b in (h.trust_badges or [])
+        ],
     )
 
 

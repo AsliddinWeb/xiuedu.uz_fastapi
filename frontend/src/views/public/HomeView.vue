@@ -14,7 +14,7 @@ import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   ArrowRightIcon, ChevronRightIcon, ChevronDownIcon,
-  StarIcon, ShieldCheckIcon, PhoneIcon,
+  StarIcon, PhoneIcon,
   PlayIcon, ArrowsPointingOutIcon, XMarkIcon, ChevronLeftIcon, MapPinIcon,
   CalendarDaysIcon
 } from '@heroicons/vue/24/outline'
@@ -215,12 +215,8 @@ function sectionSubtitle(key, fallbackKey) {
   return sectionOf(key).subtitle || (fallbackKey ? t(fallbackKey) : '')
 }
 
-// Trust badges — kept hardcoded since they're brand-fixed
-const heroTrust = [
-  { label: 'Cambridge', sub: 'English Partner' },
-  { label: 'ISO 9001',  sub: 'Quality Cert' },
-  { label: 'OTV',       sub: 'Litsenziya' }
-]
+// Trust badges from CMS
+const heroTrust = computed(() => hero.value?.trust_badges || [])
 </script>
 
 <template>
@@ -357,7 +353,7 @@ const heroTrust = [
                   <div v-for="b in heroTrust" :key="b.label" class="flex items-center gap-2">
                     <div class="w-9 h-9 rounded-lg grid place-items-center"
                          style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);">
-                      <ShieldCheckIcon class="w-4 h-4 text-accent-400" />
+                      <component :is="resolveIcon(b.icon || 'ShieldCheckIcon')" class="w-4 h-4 text-accent-400" />
                     </div>
                     <div class="leading-tight">
                       <p class="text-[12px] font-bold text-white/85">{{ b.label }}</p>

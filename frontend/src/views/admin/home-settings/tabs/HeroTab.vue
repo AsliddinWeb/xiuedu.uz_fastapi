@@ -3,7 +3,7 @@
  * Hero settings — singleton row with variant-driven layout.
  */
 import { ref, reactive, onMounted, computed } from 'vue'
-import { Save, Image as ImageIcon, Video, LayoutPanelLeft, BarChart3, Minimize2 } from 'lucide-vue-next'
+import { Save, Image as ImageIcon, Video, LayoutPanelLeft, BarChart3, Minimize2, Plus, Trash2 } from 'lucide-vue-next'
 import { AdminHomeAPI } from '@/api/admin'
 import UIButton from '@/components/ui/UIButton.vue'
 import MultilingualInput from '@/components/admin/MultilingualInput.vue'
@@ -255,6 +255,53 @@ const showQuote     = computed(() => form.variant === 'split')
         </div>
         <div class="sm:col-span-2">
           <MultilingualInput v-model="form" base="badge2_label" label="Label" placeholder="Bitiruvchilar ish bilan" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust badges strip -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 p-5 mb-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-ink-faint">Akkreditatsiya va sheriklar</p>
+          <p class="text-[11px] text-ink-faint mt-0.5">CTA tugmalardan pastda ko'rinadigan kichik badge'lar</p>
+        </div>
+        <button type="button" class="text-[11px] font-bold text-primary-700 hover:text-accent-600"
+                @click="if (!form.trust_badges) form.trust_badges = []; form.trust_badges.push({label:'', sub_uz:'', sub_ru:'', sub_en:'', icon:'ShieldCheckIcon'})">
+          <Plus class="w-3 h-3 inline" /> Qo'shish
+        </button>
+      </div>
+      <div v-if="!form.trust_badges?.length" class="text-xs text-ink-faint text-center py-4">Hozircha yo'q</div>
+      <div v-else class="space-y-3">
+        <div
+          v-for="(b, i) in form.trust_badges"
+          :key="i"
+          class="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 items-end p-3 rounded-xl bg-surface-soft dark:bg-slate-900/30"
+        >
+          <div>
+            <label class="block text-[10px] uppercase tracking-wider text-ink-faint mb-1">Label</label>
+            <input type="text" v-model="b.label" placeholder="Cambridge"
+                   class="w-full h-9 px-2 rounded border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-xs" />
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase tracking-wider text-ink-faint mb-1">UZ</label>
+            <input type="text" v-model="b.sub_uz" placeholder="English Partner"
+                   class="w-full h-9 px-2 rounded border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-xs" />
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase tracking-wider text-ink-faint mb-1">RU</label>
+            <input type="text" v-model="b.sub_ru" placeholder="Партнёр"
+                   class="w-full h-9 px-2 rounded border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-xs" />
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase tracking-wider text-ink-faint mb-1">EN</label>
+            <input type="text" v-model="b.sub_en" placeholder="Partner"
+                   class="w-full h-9 px-2 rounded border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-xs" />
+          </div>
+          <button type="button" class="w-8 h-9 grid place-items-center rounded text-ink-faint hover:text-danger"
+                  @click="form.trust_badges.splice(i, 1)">
+            <Trash2 class="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </div>
