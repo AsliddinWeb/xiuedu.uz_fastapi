@@ -2,6 +2,8 @@ from fastapi import APIRouter
 
 from app.routers.auth import router as auth_router
 from app.routers.chat import router as chat_router
+from app.routers.site_settings import admin as site_settings_admin
+from app.routers.site_settings import public as site_settings_public
 from app.routers.contact import router as contact_router
 from app.routers.event import admin as events_admin
 from app.routers.event import public as events_public
@@ -57,6 +59,7 @@ api_router.include_router(vacancies_public)
 api_router.include_router(contact_page_public)
 api_router.include_router(gallery_public)
 api_router.include_router(chat_router)
+api_router.include_router(site_settings_public)
 
 # Admin
 api_router.include_router(pages_admin)
@@ -75,6 +78,7 @@ api_router.include_router(structure_admin)
 api_router.include_router(intl_admin)
 api_router.include_router(vacancies_admin)
 api_router.include_router(contact_page_admin)
+api_router.include_router(site_settings_admin)
 api_router.include_router(gallery_admin)
 
 

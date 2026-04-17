@@ -14,7 +14,7 @@ import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   ArrowRightIcon, ChevronRightIcon, ChevronDownIcon,
-  StarIcon, ShieldCheckIcon, BriefcaseIcon, PhoneIcon, ClockIcon,
+  StarIcon, ShieldCheckIcon, PhoneIcon,
   PlayIcon, ArrowsPointingOutIcon, XMarkIcon, ChevronLeftIcon, MapPinIcon,
   CalendarDaysIcon
 } from '@heroicons/vue/24/outline'
@@ -373,15 +373,15 @@ const heroTrust = [
               <div class="absolute inset-0 rounded-3xl translate-x-5 translate-y-5"
                    style="border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03);" />
 
-              <div v-if="hero.show_floating_cards"
+              <div v-if="hero.show_floating_cards && hero.badge1_value"
                    class="absolute -top-4 -right-4 z-20 px-4 py-3 rounded-2xl flex items-center gap-3"
                    style="background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 grid place-items-center text-white">
-                  <StarIcon class="w-5 h-5" />
+                  <component :is="resolveIcon(hero.badge1_icon || 'StarIcon')" class="w-5 h-5" />
                 </div>
                 <div class="leading-tight">
-                  <p class="text-[15px] font-display font-extrabold text-primary-900">TOP-12</p>
-                  <p class="text-[10px] font-semibold text-ink-faint">{{ t('home.hero_badge_rating') }}</p>
+                  <p class="text-[15px] font-display font-extrabold text-primary-900">{{ hero.badge1_value }}</p>
+                  <p class="text-[10px] font-semibold text-ink-faint">{{ hero.badge1_label }}</p>
                 </div>
               </div>
 
@@ -405,16 +405,16 @@ const heroTrust = [
                 </div>
               </div>
 
-              <div v-if="hero.show_floating_cards"
+              <div v-if="hero.show_floating_cards && hero.badge2_value"
                    class="absolute -bottom-5 -left-5 z-20 px-4 py-3 rounded-2xl"
                    style="background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 grid place-items-center text-white">
-                    <BriefcaseIcon class="w-5 h-5" />
+                    <component :is="resolveIcon(hero.badge2_icon || 'BriefcaseIcon')" class="w-5 h-5" />
                   </div>
                   <div class="leading-tight">
-                    <p class="text-[15px] font-display font-extrabold text-primary-900">80%</p>
-                    <p class="text-[10px] font-semibold text-ink-faint">{{ t('home.hero_badge_employed') }}</p>
+                    <p class="text-[15px] font-display font-extrabold text-primary-900">{{ hero.badge2_value }}</p>
+                    <p class="text-[10px] font-semibold text-ink-faint">{{ hero.badge2_label }}</p>
                   </div>
                 </div>
               </div>

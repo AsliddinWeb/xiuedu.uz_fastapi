@@ -10,7 +10,7 @@ import {
   HomeIcon, NewspaperIcon, CalendarDaysIcon, FolderIcon,
   DocumentTextIcon, UserGroupIcon, MagnifyingGlassIcon, UserCircleIcon,
   BuildingLibraryIcon, BuildingOffice2Icon, AcademicCapIcon, GlobeAltIcon,
-  BriefcaseIcon, PhoneIcon, PhotoIcon,
+  BriefcaseIcon, PhoneIcon, PhotoIcon, Cog6ToothIcon,
   Bars3Icon, BellIcon, ArrowTopRightOnSquareIcon, ArrowRightOnRectangleIcon
 } from '@heroicons/vue/24/outline'
 
@@ -72,8 +72,9 @@ const navGroups = computed(() => {
       title: 'Tizim',
       roles: ['admin', 'content_manager'],
       items: [
-        { to: '/admin/users', label: 'Foydalanuvchilar', icon: UserGroupIcon },
-        { to: '/admin/seo',   label: 'SEO va URL',       icon: MagnifyingGlassIcon }
+        { to: '/admin/site-settings', label: 'Sayt sozlamalari', icon: Cog6ToothIcon },
+        { to: '/admin/users',         label: 'Foydalanuvchilar', icon: UserGroupIcon },
+        { to: '/admin/seo',           label: 'SEO va URL',       icon: MagnifyingGlassIcon }
       ]
     },
     {

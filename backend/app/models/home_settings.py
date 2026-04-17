@@ -90,6 +90,19 @@ class HeroSettings(Base):
     quote_author_ru: Mapped[str | None] = mapped_column(String(255), nullable=True)
     quote_author_en: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
+    # Floating badge cards (split variant — TOP-3, 95% etc.)
+    badge1_value: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    badge1_label_uz: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    badge1_label_ru: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    badge1_label_en: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    badge1_icon:  Mapped[str | None] = mapped_column(String(60), nullable=True)
+
+    badge2_value: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    badge2_label_uz: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    badge2_label_ru: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    badge2_label_en: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    badge2_icon:  Mapped[str | None] = mapped_column(String(60), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

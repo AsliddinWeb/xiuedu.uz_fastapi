@@ -21,3 +21,4 @@ from app.models.vacancies_page import VacanciesPage, Vacancy  # noqa: F401
 from app.models.contact_page import ContactPage  # noqa: F401
 from app.models.gallery_page import GalleryPage, GalleryCategory, GalleryItem  # noqa: F401
 from app.models.chat import ContentChunk, ChatMessage  # noqa: F401
+from app.models.site_settings import SiteSettings  # noqa: F401

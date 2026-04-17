@@ -117,7 +117,10 @@ const routes = [
       { path: 'users',    name: 'admin-users',     component: () => import('@/views/admin/UsersView.vue'),
         meta: { title: 'Foydalanuvchilar', roles: ['admin'] } },
       { path: 'seo',      name: 'admin-seo',       component: () => import('@/views/admin/SEOView.vue'),
-        meta: { title: 'SEO', roles: ['admin'] } }
+        meta: { title: 'SEO', roles: ['admin'] } },
+      { path: 'site-settings', name: 'admin-site-settings',
+        component: () => import('@/views/admin/SiteSettingsView.vue'),
+        meta: { title: 'Sayt sozlamalari', roles: ['admin'] } }
     ]
   },
 

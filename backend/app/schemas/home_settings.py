@@ -76,6 +76,18 @@ class HeroBase(BaseModel):
     quote_author_ru: str | None = None
     quote_author_en: str | None = None
 
+    badge1_value: str | None = None
+    badge1_label_uz: str | None = None
+    badge1_label_ru: str | None = None
+    badge1_label_en: str | None = None
+    badge1_icon: str | None = None
+
+    badge2_value: str | None = None
+    badge2_label_uz: str | None = None
+    badge2_label_ru: str | None = None
+    badge2_label_en: str | None = None
+    badge2_icon: str | None = None
+
 
 class HeroUpdate(HeroBase):
     pass
@@ -119,6 +131,14 @@ class HeroPublicOut(BaseModel):
 
     quote_text: str | None
     quote_author: str | None
+
+    badge1_value: str | None
+    badge1_label: str | None
+    badge1_icon: str | None
+
+    badge2_value: str | None
+    badge2_label: str | None
+    badge2_icon: str | None
 
 
 # ══════════════════════════════════════════════════════════

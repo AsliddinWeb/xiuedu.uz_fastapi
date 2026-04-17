@@ -81,6 +81,12 @@ def _hero_public(h: HeroSettings | None, lang: Lang) -> HeroPublicOut | None:
         show_floating_cards=h.show_floating_cards,
         quote_text=pick(h, "quote_text", lang),
         quote_author=pick(h, "quote_author", lang),
+        badge1_value=h.badge1_value,
+        badge1_label=pick(h, "badge1_label", lang),
+        badge1_icon=h.badge1_icon,
+        badge2_value=h.badge2_value,
+        badge2_label=pick(h, "badge2_label", lang),
+        badge2_icon=h.badge2_icon,
     )
 
 
