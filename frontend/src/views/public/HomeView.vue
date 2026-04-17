@@ -314,7 +314,7 @@ const heroTrust = [
 
               <!-- Stats inline (split + stats variants) -->
               <div v-if="stats.length" class="hero-enter mt-8 flex items-center gap-8" style="animation-delay: 0.65s;">
-                <div v-for="s in stats.slice(0, 3)" :key="s.id">
+                <div v-for="s in stats.slice(0, 4)" :key="s.id">
                   <div class="text-3xl md:text-[32px] font-display font-extrabold text-white tracking-tight">{{ s.value }}</div>
                   <div class="text-[11px] text-white/45 mt-0.5 uppercase tracking-wider">{{ s.label }}</div>
                 </div>
@@ -380,7 +380,7 @@ const heroTrust = [
                   <StarIcon class="w-5 h-5" />
                 </div>
                 <div class="leading-tight">
-                  <p class="text-[15px] font-display font-extrabold text-primary-900">TOP-3</p>
+                  <p class="text-[15px] font-display font-extrabold text-primary-900">TOP-12</p>
                   <p class="text-[10px] font-semibold text-ink-faint">{{ t('home.hero_badge_rating') }}</p>
                 </div>
               </div>
@@ -413,7 +413,7 @@ const heroTrust = [
                     <BriefcaseIcon class="w-5 h-5" />
                   </div>
                   <div class="leading-tight">
-                    <p class="text-[15px] font-display font-extrabold text-primary-900">95%</p>
+                    <p class="text-[15px] font-display font-extrabold text-primary-900">80%</p>
                     <p class="text-[10px] font-semibold text-ink-faint">{{ t('home.hero_badge_employed') }}</p>
                   </div>
                 </div>

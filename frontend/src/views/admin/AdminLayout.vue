@@ -70,7 +70,7 @@ const navGroups = computed(() => {
     },
     {
       title: 'Tizim',
-      roles: ['admin'],
+      roles: ['admin', 'content_manager'],
       items: [
         { to: '/admin/users', label: 'Foydalanuvchilar', icon: UserGroupIcon },
         { to: '/admin/seo',   label: 'SEO va URL',       icon: MagnifyingGlassIcon }
