@@ -29,7 +29,7 @@ import InstagramIcon from '@/components/icons/InstagramIcon.vue'
 import FacebookIcon from '@/components/icons/FacebookIcon.vue'
 import YoutubeIcon from '@/components/icons/YoutubeIcon.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 
 // ===== state =====
@@ -187,6 +187,13 @@ const isActive = (item) =>
 </script>
 
 <template>
+  <!-- ============ Test mode banner ============ -->
+  <div class="relative z-[61] bg-red-600 text-white text-center py-1.5 text-[12px] font-semibold tracking-wide">
+    <span v-if="locale === 'ru'">⚠️ Сайт запущен в тестовом режиме. Возможны ошибки и недоработки.</span>
+    <span v-else-if="locale === 'en'">⚠️ This site is running in test mode. Errors and issues may occur.</span>
+    <span v-else>⚠️ Sayt test rejimida ishga tushirildi. Xato va kamchiliklar bo'lishi mumkin.</span>
+  </div>
+
   <!-- ============ Top utility bar ============ -->
   <div class="hidden lg:block relative z-[60] bg-[#080A2D] text-white border-b border-white/[0.06]">
     <div class="container-fluid h-10 flex items-center justify-between text-[12px]">
