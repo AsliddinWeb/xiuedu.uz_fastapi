@@ -74,7 +74,7 @@ const navGroups = computed(() => {
       items: [
         { to: '/admin/site-settings', label: 'Sayt sozlamalari', icon: Cog6ToothIcon },
         { to: '/admin/users',         label: 'Foydalanuvchilar', icon: UserGroupIcon },
-        { to: '/admin/seo',           label: 'SEO va URL',       icon: MagnifyingGlassIcon }
+        { to: '/admin/seo',           label: 'URL redirectlar',  icon: MagnifyingGlassIcon }
       ]
     },
     {
