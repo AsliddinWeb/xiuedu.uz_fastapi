@@ -102,6 +102,10 @@ def _section_public(s: HomeSection, lang: Lang) -> SectionPublicOut:
         eyebrow=pick(s, "eyebrow", lang),
         title=pick(s, "title", lang),
         subtitle=pick(s, "subtitle", lang),
+        body_p1=pick(s, "body_p1", lang),
+        body_p2=pick(s, "body_p2", lang),
+        link_label=pick(s, "link_label", lang),
+        link_url=s.link_url,
         settings=s.settings or {},
     )
 

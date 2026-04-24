@@ -139,6 +139,21 @@ class HomeSection(Base):
     subtitle_ru: Mapped[str | None] = mapped_column(Text, nullable=True)
     subtitle_en: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    # Body paragraphs (used by intro section — 2 paragraphs of free text)
+    body_p1_uz: Mapped[str | None] = mapped_column(Text, nullable=True)
+    body_p1_ru: Mapped[str | None] = mapped_column(Text, nullable=True)
+    body_p1_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    body_p2_uz: Mapped[str | None] = mapped_column(Text, nullable=True)
+    body_p2_ru: Mapped[str | None] = mapped_column(Text, nullable=True)
+    body_p2_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Inline link under body (label + url; defaults rendered if null)
+    link_label_uz: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    link_label_ru: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    link_label_en: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    link_url:      Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     # Per-section settings (e.g. news limit, columns, bg variant)
     settings: Mapped[dict] = mapped_column(JSONField, default=dict, nullable=False)
 

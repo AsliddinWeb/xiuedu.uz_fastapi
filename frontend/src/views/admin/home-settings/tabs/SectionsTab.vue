@@ -93,6 +93,16 @@ async function save() {
       subtitle_uz: form.subtitle_uz || null,
       subtitle_ru: form.subtitle_ru || null,
       subtitle_en: form.subtitle_en || null,
+      body_p1_uz: form.body_p1_uz || null,
+      body_p1_ru: form.body_p1_ru || null,
+      body_p1_en: form.body_p1_en || null,
+      body_p2_uz: form.body_p2_uz || null,
+      body_p2_ru: form.body_p2_ru || null,
+      body_p2_en: form.body_p2_en || null,
+      link_label_uz: form.link_label_uz || null,
+      link_label_ru: form.link_label_ru || null,
+      link_label_en: form.link_label_en || null,
+      link_url: form.link_url || null,
       settings
     }
     await AdminHomeAPI.sections.update(editing.value.key, payload)
@@ -193,6 +203,28 @@ async function save() {
         <MultilingualInput v-model="form" base="eyebrow"  label="Eyebrow override" />
         <MultilingualInput v-model="form" base="title"    label="Sarlavha override" />
         <MultilingualInput v-model="form" base="subtitle" label="Subtitle override" textarea :rows="2" />
+
+        <div class="border-t border-surface-muted dark:border-slate-700 pt-4">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-faint mb-3">
+            Body (intro va shunga o'xshash sectionlar uchun)
+          </p>
+          <div class="space-y-3">
+            <MultilingualInput v-model="form" base="body_p1" label="1-paragraf" textarea :rows="3" />
+            <MultilingualInput v-model="form" base="body_p2" label="2-paragraf" textarea :rows="3" />
+            <MultilingualInput v-model="form" base="link_label" label="Havola matni" />
+            <div>
+              <label class="block text-sm font-medium text-ink-medium dark:text-slate-300 mb-1.5">
+                Havola URL'i
+              </label>
+              <input
+                v-model="form.link_url"
+                type="text"
+                placeholder="/about"
+                class="w-full px-3 py-2 rounded-lg border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:border-primary-500"
+              />
+            </div>
+          </div>
+        </div>
 
         <div class="border-t border-surface-muted dark:border-slate-700 pt-4">
           <label class="block text-sm font-medium text-ink-medium dark:text-slate-300 mb-1.5">

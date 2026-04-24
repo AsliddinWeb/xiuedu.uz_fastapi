@@ -214,6 +214,18 @@ function sectionEyebrow(key, fallbackKey) {
 function sectionSubtitle(key, fallbackKey) {
   return sectionOf(key).subtitle || (fallbackKey ? t(fallbackKey) : '')
 }
+function sectionBodyP1(key, fallbackKey) {
+  return sectionOf(key).body_p1 || (fallbackKey ? t(fallbackKey) : '')
+}
+function sectionBodyP2(key, fallbackKey) {
+  return sectionOf(key).body_p2 || (fallbackKey ? t(fallbackKey) : '')
+}
+function sectionLinkLabel(key, fallbackKey) {
+  return sectionOf(key).link_label || (fallbackKey ? t(fallbackKey) : '')
+}
+function sectionLinkUrl(key, fallbackUrl) {
+  return sectionOf(key).link_url || fallbackUrl
+}
 
 // Trust badges from CMS
 const heroTrust = computed(() => hero.value?.trust_badges || [])
@@ -540,12 +552,12 @@ const heroTrust = computed(() => hero.value?.trust_badges || [])
               <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight mb-6">
                 {{ sectionTitle('intro', 'home.intro_title') }}
               </h2>
-              <p class="text-[16px] text-ink-light dark:text-slate-400 leading-relaxed mb-4">{{ t('home.intro_p1') }}</p>
-              <p class="text-[16px] text-ink-light dark:text-slate-400 leading-relaxed mb-8">{{ t('home.intro_p2') }}</p>
-              <RouterLink to="/about"
+              <p class="text-[16px] text-ink-light dark:text-slate-400 leading-relaxed mb-4">{{ sectionBodyP1('intro', 'home.intro_p1') }}</p>
+              <p class="text-[16px] text-ink-light dark:text-slate-400 leading-relaxed mb-8">{{ sectionBodyP2('intro', 'home.intro_p2') }}</p>
+              <RouterLink :to="sectionLinkUrl('intro', '/about')"
                 class="group inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-50 hover:bg-primary-100 text-primary-800 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 font-semibold text-[14px] transition-colors"
               >
-                {{ t('home.intro_link') }}
+                {{ sectionLinkLabel('intro', 'home.intro_link') }}
                 <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </RouterLink>
             </div>

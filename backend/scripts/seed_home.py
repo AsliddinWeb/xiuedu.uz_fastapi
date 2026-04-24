@@ -88,6 +88,28 @@ SECTIONS = [
     "intro", "news", "campus", "why_xiu", "academic", "admission",
     "numbers", "events", "testimonials", "partners", "licenses", "faq",
 ]
+
+# Optional default content per section (body paragraphs + link).
+# Only seeded if the section row didn't exist yet — won't overwrite admin edits.
+SECTION_DEFAULTS = {
+    "intro": dict(
+        eyebrow_uz="Universitet", eyebrow_ru="Университет", eyebrow_en="University",
+        title_uz="Bilim, nufuz va kelajak — bir maskanda",
+        title_ru="Знания, престиж и будущее — в одном месте",
+        title_en="Knowledge, prestige and future — in one place",
+        body_p1_uz="2009 yildan beri biz minglab talabalarga jahon darajasidagi ta'lim, zamonaviy infratuzilma va xalqaro hamkorlik imkoniyatlarini taqdim etib kelmoqdamiz.",
+        body_p1_ru="С 2009 года мы предоставляем тысячам студентов образование мирового уровня, современную инфраструктуру и возможности международного сотрудничества.",
+        body_p1_en="Since 2009 we have been providing thousands of students with world-class education, modern infrastructure and international partnership opportunities.",
+        body_p2_uz="Bugungi kunda XIU 5000 dan ortiq talaba, 150 dan ortiq professor-o'qituvchi va 50+ xalqaro hamkor bilan O'zbekistonning yetakchi xususiy universitetlaridan biriga aylangan.",
+        body_p2_ru="Сегодня XIU — один из ведущих частных университетов Узбекистана с более чем 5000 студентами, 150+ преподавателями и 50+ международными партнёрами.",
+        body_p2_en="Today XIU is one of the leading private universities in Uzbekistan with over 5,000 students, 150+ faculty members and 50+ international partners.",
+        link_label_uz="Universitet tarixini bilish",
+        link_label_ru="Узнать историю университета",
+        link_label_en="Learn about the university",
+        link_url="/about",
+    ),
+}
+
 async def upsert_sections(session):
     for i, key in enumerate(SECTIONS):
         existing = (await session.execute(
@@ -95,7 +117,9 @@ async def upsert_sections(session):
         )).scalar_one_or_none()
         if existing:
             continue
-        session.add(HomeSection(key=key, enabled=True, sort_order=i, settings={}))
+        kwargs = dict(key=key, enabled=True, sort_order=i, settings={})
+        kwargs.update(SECTION_DEFAULTS.get(key, {}))
+        session.add(HomeSection(**kwargs))
     print(f"  {len(SECTIONS)} sections seeded")
 
 

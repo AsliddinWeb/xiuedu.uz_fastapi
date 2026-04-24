@@ -160,6 +160,16 @@ class SectionBase(BaseModel):
     subtitle_uz: str | None = None
     subtitle_ru: str | None = None
     subtitle_en: str | None = None
+    body_p1_uz: str | None = None
+    body_p1_ru: str | None = None
+    body_p1_en: str | None = None
+    body_p2_uz: str | None = None
+    body_p2_ru: str | None = None
+    body_p2_en: str | None = None
+    link_label_uz: str | None = None
+    link_label_ru: str | None = None
+    link_label_en: str | None = None
+    link_url: str | None = None
     settings: dict = {}
 
 
@@ -180,6 +190,10 @@ class SectionPublicOut(BaseModel):
     eyebrow: str | None
     title: str | None
     subtitle: str | None
+    body_p1: str | None = None
+    body_p2: str | None = None
+    link_label: str | None = None
+    link_url: str | None = None
     settings: dict
 
 
