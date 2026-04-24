@@ -27,6 +27,23 @@ const levelStyle = computed(() => {
 
 const studyForms = computed(() => props.program.study_forms || [])
 const totalSeats = computed(() => studyForms.value.reduce((s, f) => s + (f.seats || 0), 0))
+
+// For bachelor-level programs we want to always show both kunduzgi and sirtqi
+// rows (keeps card height consistent). Missing forms render as a greyed-out
+// "mavjud emas" row so they visually take the same space.
+const COMPLEMENT_FORMS = ['full_time', 'part_time']
+const displayForms = computed(() => {
+  const present = new Map(studyForms.value.map(f => [f.form, f]))
+  const rows = []
+  for (const form of COMPLEMENT_FORMS) {
+    if (present.has(form)) rows.push({ ...present.get(form), missing: false })
+    else rows.push({ form, missing: true })
+  }
+  for (const f of studyForms.value) {
+    if (!COMPLEMENT_FORMS.includes(f.form)) rows.push({ ...f, missing: false })
+  }
+  return rows
+})
 </script>
 
 <template>
@@ -85,18 +102,23 @@ const totalSeats = computed(() => studyForms.value.reduce((s, f) => s + (f.seats
       <!-- Study forms — per-form tuition strip -->
       <div class="mt-auto pt-4 border-t border-ink-dark/10 dark:border-white/10 space-y-2">
         <div
-          v-for="(sf, i) in studyForms"
+          v-for="(sf, i) in displayForms"
           :key="i"
-          class="flex items-center justify-between text-[12px]"
+          :class="['flex items-center justify-between text-[12px]', sf.missing && 'opacity-50']"
         >
           <span class="inline-flex items-center gap-1.5">
             <BookOpenCheck class="w-3.5 h-3.5 text-ink-faint" />
             <span class="font-semibold text-ink-medium dark:text-slate-300">{{ formLabel(sf.form) }}</span>
-            <span v-if="sf.seats" class="text-ink-faint">({{ sf.seats }} {{ t('home.program_seats') }})</span>
+            <span v-if="!sf.missing && sf.seats" class="text-ink-faint">({{ sf.seats }} {{ t('home.program_seats') }})</span>
           </span>
-          <span class="px-2.5 py-0.5 rounded-md bg-white/80 dark:bg-slate-900/40 font-bold text-primary-800 dark:text-accent-400">
-            {{ sf.tuition }}
-          </span>
+          <span
+            v-if="!sf.missing"
+            class="px-2.5 py-0.5 rounded-md bg-white/80 dark:bg-slate-900/40 font-bold text-primary-800 dark:text-accent-400"
+          >{{ sf.tuition }}</span>
+          <span
+            v-else
+            class="px-2.5 py-0.5 rounded-md bg-surface-muted/60 dark:bg-slate-700/40 font-semibold text-ink-faint italic"
+          >{{ t('home.form_unavailable') }}</span>
         </div>
       </div>
     </div>

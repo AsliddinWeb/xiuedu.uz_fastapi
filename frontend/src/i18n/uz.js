@@ -319,6 +319,7 @@ export default {
     form_part_time:    'Sirtqi',
     form_evening:      'Kechki',
     form_online:       'Onlayn',
+    form_unavailable:  'mavjud emas',
     program_credits:   'kredit',
     program_seats:     "o'rin",
     program_degree:    'Daraja',

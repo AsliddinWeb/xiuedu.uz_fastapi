@@ -6,6 +6,16 @@ import aspectRatio from '@tailwindcss/aspect-ratio'
 export default {
   darkMode: 'class',
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  // Safelist classes coming from the CMS (faculty/program bg_class, icon_bg_class, ring_class)
+  safelist: [
+    {
+      pattern: /^(bg|ring)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900)(\/\d{1,3})?$/,
+      variants: ['dark', 'hover', 'group-hover'],
+    },
+    {
+      pattern: /^(dark:bg|dark:ring)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900)(\/\d{1,3})?$/,
+    },
+  ],
   theme: {
     extend: {
       colors: {

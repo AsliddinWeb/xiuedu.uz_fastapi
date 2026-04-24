@@ -247,6 +247,7 @@ export default {
     form_part_time:    'Заочная',
     form_evening:      'Вечерняя',
     form_online:       'Онлайн',
+    form_unavailable:  'недоступно',
     program_credits:   'кредитов',
     program_seats:     'мест',
     program_degree:    'Степень',

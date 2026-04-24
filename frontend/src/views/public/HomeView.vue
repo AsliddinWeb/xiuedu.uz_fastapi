@@ -731,10 +731,10 @@ const heroTrust = computed(() => hero.value?.trust_badges || [])
             <div data-animate class="max-w-2xl">
               <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">{{ sectionEyebrow('academic', 'home.academic_eyebrow') }}</p>
               <h2 class="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-ink-dark dark:text-white leading-[1.15] tracking-tight">{{ sectionTitle('academic', 'home.academic_title') }}</h2>
-              <p class="mt-4 text-[15px] text-ink-light dark:text-slate-400">{{ t('home.academic_lead') }}</p>
+              <p class="mt-4 text-[15px] text-ink-light dark:text-slate-400">{{ sectionSubtitle('academic', 'home.academic_lead') }}</p>
             </div>
-            <RouterLink to="/faculties" class="hidden lg:inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 dark:text-primary-300 hover:text-accent-600 group whitespace-nowrap">
-              <span class="border-b border-current pb-0.5">{{ t('home.academic_all') }}</span>
+            <RouterLink :to="sectionLinkUrl('academic', '/faculties')" class="hidden lg:inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 dark:text-primary-300 hover:text-accent-600 group whitespace-nowrap">
+              <span class="border-b border-current pb-0.5">{{ sectionLinkLabel('academic', 'home.academic_all') }}</span>
               <ArrowRightIcon class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
             </RouterLink>
           </div>

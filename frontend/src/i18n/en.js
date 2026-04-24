@@ -247,6 +247,7 @@ export default {
     form_part_time:    'Part-time',
     form_evening:      'Evening',
     form_online:       'Online',
+    form_unavailable:  'not available',
     program_credits:   'credits',
     program_seats:     'seats',
     program_degree:    'Degree',

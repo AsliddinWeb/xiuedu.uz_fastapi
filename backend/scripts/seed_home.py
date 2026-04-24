@@ -108,6 +108,21 @@ SECTION_DEFAULTS = {
         link_label_en="Learn about the university",
         link_url="/about",
     ),
+    "academic": dict(
+        eyebrow_uz="Akademik yo'nalishlar",
+        eyebrow_ru="Академические направления",
+        eyebrow_en="Academic programs",
+        title_uz="Fakultetlar va dasturlar",
+        title_ru="Факультеты и программы",
+        title_en="Faculties and programs",
+        subtitle_uz="4 ta fakultet, 24 ta zamonaviy yo'nalish — bakalavr va magistratura dasturlari.",
+        subtitle_ru="4 факультета, 24 современных направления — программы бакалавриата и магистратуры.",
+        subtitle_en="4 faculties, 24 modern programs — bachelor's and master's degrees.",
+        link_label_uz="Barcha fakultetlar",
+        link_label_ru="Все факультеты",
+        link_label_en="All faculties",
+        link_url="/faculties",
+    ),
 }
 
 async def upsert_sections(session):
