@@ -73,9 +73,13 @@ const socials = [
               class="w-12 h-12 rounded-xl grid place-items-center text-white font-display font-bold text-2xl"
               style="background: linear-gradient(135deg, #1A1F6E, #0A0D3D); box-shadow: 0 4px 24px rgba(26,31,110,0.5);"
             >X</span>
-            <div v-if="!siteSettings.logoDarkUrl" class="leading-tight">
-              <p class="font-display text-lg font-bold text-white">{{ siteSettings.shortName || 'XIU Edu' }}</p>
-              <p class="text-[11px] text-primary-200/60">{{ t('site.short') }}</p>
+            <div class="leading-tight">
+              <p class="font-display text-base font-bold text-white">
+                {{ siteSettings.brandLine1 || 'Xalqaro Innovatsion' }}
+              </p>
+              <p class="text-[11px] text-primary-200/60">
+                {{ siteSettings.brandLine2 || 'Universiteti' }}
+              </p>
             </div>
           </div>
           <p class="text-sm text-primary-200/60 leading-relaxed mb-5">

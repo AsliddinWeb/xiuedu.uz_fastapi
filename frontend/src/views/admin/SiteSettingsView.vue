@@ -74,6 +74,14 @@ async function save() {
           <MediaPicker v-model="form.favicon_url" label="Favicon" />
           <MediaPicker v-model="form.og_image_url" label="OG Image (default)" />
         </div>
+
+        <div class="pt-4 border-t border-surface-muted dark:border-slate-700 space-y-3">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
+            Logo yonidagi matn (navbar va footer)
+          </p>
+          <MultilingualInput v-model="form" base="brand_line1" label="Yuqori qator" placeholder="Xalqaro Innovatsion" />
+          <MultilingualInput v-model="form" base="brand_line2" label="Pastki qator"  placeholder="Universiteti" />
+        </div>
       </div>
 
       <!-- Contact -->

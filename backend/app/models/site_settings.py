@@ -26,6 +26,15 @@ class SiteSettings(Base):
     favicon_url:   Mapped[str | None] = mapped_column(String(500), nullable=True)
     og_image_url:  Mapped[str | None] = mapped_column(String(500), nullable=True)
 
+    # Two-line brand label shown next to the logo (navbar/footer).
+    # Line 1 — bold top, Line 2 — muted bottom. Multilingual.
+    brand_line1_uz: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    brand_line1_ru: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    brand_line1_en: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    brand_line2_uz: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    brand_line2_ru: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    brand_line2_en: Mapped[str | None] = mapped_column(String(120), nullable=True)
+
     # Footer
     footer_desc_uz: Mapped[str | None] = mapped_column(Text, nullable=True)
     footer_desc_ru: Mapped[str | None] = mapped_column(Text, nullable=True)

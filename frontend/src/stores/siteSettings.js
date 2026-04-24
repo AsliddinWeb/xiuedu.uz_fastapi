@@ -12,6 +12,8 @@ export const useSiteSettingsStore = defineStore('siteSettings', () => {
   const faviconUrl  = computed(() => data.value?.favicon_url || null)
   const siteName    = computed(() => data.value?.site_name || null)
   const shortName   = computed(() => data.value?.site_short_name || null)
+  const brandLine1  = computed(() => data.value?.brand_line1 || null)
+  const brandLine2  = computed(() => data.value?.brand_line2 || null)
 
   async function ensureLoaded(force = false) {
     if (loaded.value && !force) return data.value
@@ -29,5 +31,10 @@ export const useSiteSettingsStore = defineStore('siteSettings', () => {
     return data.value
   }
 
-  return { data, loading, loaded, logoUrl, logoDarkUrl, faviconUrl, siteName, shortName, ensureLoaded }
+  return {
+    data, loading, loaded,
+    logoUrl, logoDarkUrl, faviconUrl, siteName, shortName,
+    brandLine1, brandLine2,
+    ensureLoaded,
+  }
 })

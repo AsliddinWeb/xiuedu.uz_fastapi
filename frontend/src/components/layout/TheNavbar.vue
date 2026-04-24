@@ -263,9 +263,13 @@ const isActive = (item) =>
             v-else
             class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 grid place-items-center text-white font-display font-bold text-xl shadow-button"
           >X</span>
-          <div v-if="!siteSettings.logoDarkUrl" class="hidden sm:block leading-tight">
-            <div class="text-white font-display font-bold text-sm">Xalqaro Innovatsion</div>
-            <div class="text-white/70 text-xs font-medium">Universiteti</div>
+          <div class="hidden sm:block leading-tight">
+            <div class="text-white font-display font-bold text-sm">
+              {{ siteSettings.brandLine1 || 'Xalqaro Innovatsion' }}
+            </div>
+            <div class="text-white/70 text-xs font-medium">
+              {{ siteSettings.brandLine2 || 'Universiteti' }}
+            </div>
           </div>
         </RouterLink>
 

@@ -24,7 +24,9 @@ async def get_site_settings(
     if not s:
         return SiteSettingsPublic(
             site_name=None, site_short_name=None, logo_url=None, logo_dark_url=None,
-            favicon_url=None, og_image_url=None, footer_desc=None,
+            favicon_url=None, og_image_url=None,
+            brand_line1=None, brand_line2=None,
+            footer_desc=None,
             telegram_url=None, instagram_url=None, facebook_url=None, youtube_url=None,
             phone=None, email=None, address=None, hemis_url=None, admission_url=None,
         )
@@ -35,6 +37,8 @@ async def get_site_settings(
         logo_dark_url=s.logo_dark_url,
         favicon_url=s.favicon_url,
         og_image_url=s.og_image_url,
+        brand_line1=pick(s, "brand_line1", lang),
+        brand_line2=pick(s, "brand_line2", lang),
         footer_desc=pick(s, "footer_desc", lang),
         telegram_url=s.telegram_url,
         instagram_url=s.instagram_url,

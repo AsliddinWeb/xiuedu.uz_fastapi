@@ -13,6 +13,13 @@ class SiteSettingsBase(BaseModel):
     favicon_url: str | None = None
     og_image_url: str | None = None
 
+    brand_line1_uz: str | None = None
+    brand_line1_ru: str | None = None
+    brand_line1_en: str | None = None
+    brand_line2_uz: str | None = None
+    brand_line2_ru: str | None = None
+    brand_line2_en: str | None = None
+
     footer_desc_uz: str | None = None
     footer_desc_ru: str | None = None
     footer_desc_en: str | None = None
@@ -52,6 +59,10 @@ class SiteSettingsPublic(BaseModel):
     logo_dark_url: str | None
     favicon_url: str | None
     og_image_url: str | None
+
+    brand_line1: str | None = None
+    brand_line2: str | None = None
+
     footer_desc: str | None
 
     telegram_url: str | None
