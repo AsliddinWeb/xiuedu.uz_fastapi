@@ -28,9 +28,11 @@ import TelegramIcon from '@/components/icons/TelegramIcon.vue'
 import InstagramIcon from '@/components/icons/InstagramIcon.vue'
 import FacebookIcon from '@/components/icons/FacebookIcon.vue'
 import YoutubeIcon from '@/components/icons/YoutubeIcon.vue'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
 
 const { t, locale } = useI18n()
 const route = useRoute()
+const siteSettings = useSiteSettingsStore()
 
 // ===== state =====
 const activeDropdown = ref(null)
@@ -251,16 +253,19 @@ const isActive = (item) =>
 
         <!-- ===== Logo ===== -->
         <RouterLink to="/" class="flex items-center gap-3 flex-shrink-0">
-          <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 grid place-items-center text-white font-display font-bold text-xl shadow-button">
-            X
-          </span>
-          <div class="hidden sm:block leading-tight">
-            <div class="text-white font-display font-bold text-sm">
-              Xalqaro Innovatsion
-            </div>
-            <div class="text-white/70 text-xs font-medium">
-              Universiteti
-            </div>
+          <img
+            v-if="siteSettings.logoDarkUrl"
+            :src="siteSettings.logoDarkUrl"
+            :alt="siteSettings.siteName || 'XIU Edu'"
+            class="h-11 w-auto object-contain"
+          />
+          <span
+            v-else
+            class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 grid place-items-center text-white font-display font-bold text-xl shadow-button"
+          >X</span>
+          <div v-if="!siteSettings.logoDarkUrl" class="hidden sm:block leading-tight">
+            <div class="text-white font-display font-bold text-sm">Xalqaro Innovatsion</div>
+            <div class="text-white/70 text-xs font-medium">Universiteti</div>
           </div>
         </RouterLink>
 

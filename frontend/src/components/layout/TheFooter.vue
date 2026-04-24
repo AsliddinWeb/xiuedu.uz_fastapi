@@ -9,9 +9,11 @@ import TelegramIcon  from '@/components/icons/TelegramIcon.vue'
 import InstagramIcon from '@/components/icons/InstagramIcon.vue'
 import FacebookIcon  from '@/components/icons/FacebookIcon.vue'
 import YoutubeIcon   from '@/components/icons/YoutubeIcon.vue'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
 
 const { t } = useI18n()
 const year = computed(() => new Date().getFullYear())
+const siteSettings = useSiteSettingsStore()
 
 const quickLinks = [
   { to: '/about',              key: 'nav.about' },
@@ -60,12 +62,19 @@ const socials = [
         <!-- Col 1: Brand -->
         <div>
           <div class="flex items-center gap-3 mb-5">
-            <span class="w-12 h-12 rounded-xl grid place-items-center text-white font-display font-bold text-2xl"
-                  style="background: linear-gradient(135deg, #1A1F6E, #0A0D3D); box-shadow: 0 4px 24px rgba(26,31,110,0.5);">
-              X
-            </span>
-            <div class="leading-tight">
-              <p class="font-display text-lg font-bold text-white">XIU Edu</p>
+            <img
+              v-if="siteSettings.logoDarkUrl"
+              :src="siteSettings.logoDarkUrl"
+              :alt="siteSettings.siteName || 'XIU Edu'"
+              class="h-12 w-auto object-contain"
+            />
+            <span
+              v-else
+              class="w-12 h-12 rounded-xl grid place-items-center text-white font-display font-bold text-2xl"
+              style="background: linear-gradient(135deg, #1A1F6E, #0A0D3D); box-shadow: 0 4px 24px rgba(26,31,110,0.5);"
+            >X</span>
+            <div v-if="!siteSettings.logoDarkUrl" class="leading-tight">
+              <p class="font-display text-lg font-bold text-white">{{ siteSettings.shortName || 'XIU Edu' }}</p>
               <p class="text-[11px] text-primary-200/60">{{ t('site.short') }}</p>
             </div>
           </div>

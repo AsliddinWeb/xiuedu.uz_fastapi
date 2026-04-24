@@ -3,7 +3,7 @@
  * Public layout: navbar + animated router-view + footer + global toast.
  * Auto scroll-to-top on route change.
  */
-import { watch, nextTick } from 'vue'
+import { watch, nextTick, onMounted } from 'vue'
 import { useRoute, RouterView } from 'vue-router'
 import TheNavbar from './TheNavbar.vue'
 import TheFooter from './TheFooter.vue'
@@ -11,8 +11,24 @@ import UIToast from '@/components/ui/UIToast.vue'
 import CookieConsent from '@/components/ui/CookieConsent.vue'
 import UIErrorBoundary from '@/components/ui/UIErrorBoundary.vue'
 import ChatWidget from '@/components/chat/ChatWidget.vue'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
 
 const route = useRoute()
+const siteSettings = useSiteSettingsStore()
+
+onMounted(async () => {
+  await siteSettings.ensureLoaded()
+  const fav = siteSettings.faviconUrl
+  if (fav) {
+    let link = document.querySelector("link[rel~='icon']")
+    if (!link) {
+      link = document.createElement('link')
+      link.rel = 'icon'
+      document.head.appendChild(link)
+    }
+    link.href = fav
+  }
+})
 
 watch(
   () => route.fullPath,
