@@ -12,9 +12,6 @@ export default {
       pattern: /^(bg|ring)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900)(\/\d{1,3})?$/,
       variants: ['dark', 'hover', 'group-hover'],
     },
-    {
-      pattern: /^(dark:bg|dark:ring)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900)(\/\d{1,3})?$/,
-    },
   ],
   theme: {
     extend: {
