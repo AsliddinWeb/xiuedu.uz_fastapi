@@ -20,6 +20,7 @@ const loading = ref(true)
 const GROUP_LABELS = {
   rector: 'Rektor',
   prorector: 'Prorektor',
+  division_head: "Bo'lim boshlig'i",
   dean: 'Dekan',
   department_head: 'Kafedra mudiri'
 }

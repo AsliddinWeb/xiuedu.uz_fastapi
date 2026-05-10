@@ -19,7 +19,7 @@ class Leader(Base):
     enabled:    Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     sort_order: Mapped[int]  = mapped_column(Integer, default=0, nullable=False)
 
-    # Allowed values: "rector" | "prorector" | "dean" | "department_head"
+    # Allowed values: "rector" | "prorector" | "division_head" | "dean" | "department_head"
     group: Mapped[str] = mapped_column(String(30), nullable=False, index=True)
 
     name_uz: Mapped[str] = mapped_column(String(255), nullable=False)

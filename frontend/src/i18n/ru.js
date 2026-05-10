@@ -309,6 +309,8 @@ export default {
     section_rector_title: 'Глава университета',
     section_prorectors: 'Проректоры',
     section_prorectors_title: 'Стратегическое управление',
+    section_divisions: 'Начальники отделов',
+    section_divisions_title: 'Управленческие отделы',
     section_deans: 'Деканы',
     section_deans_title: 'Руководители факультетов',
     section_departments: 'Заведующие кафедрами',

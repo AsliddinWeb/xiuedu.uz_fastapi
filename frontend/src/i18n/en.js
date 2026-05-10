@@ -309,6 +309,8 @@ export default {
     section_rector_title: 'Head of the university',
     section_prorectors: 'Vice-rectors',
     section_prorectors_title: 'Strategic management',
+    section_divisions: 'Division heads',
+    section_divisions_title: 'Administrative divisions',
     section_deans: 'Deans',
     section_deans_title: 'Faculty leaders',
     section_departments: 'Department heads',

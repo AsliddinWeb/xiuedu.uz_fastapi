@@ -49,6 +49,7 @@ watch(() => lang.currentLang, load)
 
 const rector       = computed(() => leaders.value.find(l => l.group === 'rector'))
 const prorectors   = computed(() => leaders.value.filter(l => l.group === 'prorector'))
+const divisions    = computed(() => leaders.value.filter(l => l.group === 'division_head'))
 const deans        = computed(() => leaders.value.filter(l => l.group === 'dean'))
 const departments  = computed(() => leaders.value.filter(l => l.group === 'department_head'))
 
@@ -165,6 +166,43 @@ function showBio(p) { selected.value = p; open.value = true }
               <p v-if="p.email" class="pt-4 border-t border-surface-muted dark:border-slate-700 text-[11px] text-primary-700 dark:text-primary-300 inline-flex items-center gap-1.5 font-semibold">
                 <Mail class="w-3 h-3" /> {{ p.email }}
               </p>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════
+           Division heads (Bo'lim boshliqlari) — between prorectors and deans
+      ════════════════════════════════════════════════════════════ -->
+      <section v-if="divisions.length" class="py-20 lg:py-24">
+        <div class="container-narrow">
+          <div data-animate class="text-center mb-12">
+            <p class="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent-600 mb-3">{{ t('leadership.section_divisions') }}</p>
+            <h2 class="text-3xl md:text-4xl font-display font-bold text-ink-dark dark:text-white tracking-tight">{{ t('leadership.section_divisions_title') }}</h2>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <button v-for="(p, i) in divisions" :key="p.id" data-animate :data-delay="i * 80"
+                    class="group text-left rounded-2xl p-6 bg-white dark:bg-slate-800 border border-surface-muted dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-[0_16px_40px_rgba(10,13,61,0.09)] hover:-translate-y-0.5 transition-all duration-300"
+                    @click="showBio(p)">
+              <div class="flex items-center gap-3.5 mb-4">
+                <div v-if="p.photo" class="w-14 h-14 rounded-2xl overflow-hidden shadow flex-shrink-0">
+                  <img :src="p.photo" :alt="p.name" class="w-full h-full object-cover" />
+                </div>
+                <div v-else class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-800 grid place-items-center text-white text-lg font-display font-bold shadow flex-shrink-0">
+                  {{ initials(p.name) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-[15px] font-display font-bold text-ink-dark dark:text-white leading-tight group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">{{ p.name }}</h3>
+                  <p v-if="p.degree" class="text-[11px] text-ink-faint mt-0.5 inline-flex items-center gap-1">
+                    <GraduationCap class="w-3 h-3" /> {{ p.degree }}
+                  </p>
+                </div>
+              </div>
+              <p class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-primary-700 dark:text-primary-300 px-2.5 py-1 rounded-md bg-primary-50 dark:bg-primary-900/30 mb-3">
+                <Briefcase class="w-3 h-3" /> {{ p.position }}
+              </p>
+              <p v-if="p.bio" class="text-[12.5px] text-ink-light dark:text-slate-400 leading-relaxed line-clamp-2">{{ p.bio }}</p>
             </button>
           </div>
         </div>

@@ -168,6 +168,7 @@ async function remove() {
                     class="w-full h-10 px-3 rounded-lg border border-surface-muted dark:border-slate-700 bg-white dark:bg-slate-900 text-sm">
               <option value="rector">Rektor</option>
               <option value="prorector">Prorektor</option>
+              <option value="division_head">Bo'lim boshlig'i</option>
               <option value="dean">Dekan</option>
               <option value="department_head">Kafedra mudiri</option>
             </select>

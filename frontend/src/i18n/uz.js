@@ -381,6 +381,8 @@ export default {
     section_rector_title: "Universitet rahbari",
     section_prorectors: 'Prorektorlar',
     section_prorectors_title: 'Strategik boshqaruv',
+    section_divisions: "Bo'lim boshliqlari",
+    section_divisions_title: "Boshqaruv bo'limlari",
     section_deans: 'Dekanlar',
     section_deans_title: 'Fakultet rahbarlari',
     section_departments: 'Kafedra mudirlari',
