@@ -439,6 +439,7 @@ class FacultyProgramUpdate(BaseModel):
     sort_order: int | None = None
     level: str | None = None
     study_form: str | None = None
+    study_forms: list[StudyFormItem] | None = None
     name_uz: str | None = None
     name_ru: str | None = None
     name_en: str | None = None
